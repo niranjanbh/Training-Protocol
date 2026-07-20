@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Training Protocol — One Week</title>
+<style>
+:root{
+  --bg:#0f0f0f;--card:#1a1a1a;--card2:#222;
+  --accent:#00c896;--accent2:#00a87a;
+  --warn:#ff6b35;--red:#e74c4c;--blue:#4a9eff;--purple:#a855f7;
+  --grey:#666;--text:#fff;--text2:#bbb;--text3:#777;
+  --border:#2a2a2a;--border2:#333
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh;min-height:100dvh;padding:0 0 90px;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top);overflow-x:hidden}
+.screen{display:none;padding:20px 16px;max-width:600px;margin:0 auto}
+.screen.active{display:block}
+h1{font-size:22px;font-weight:700;margin-bottom:4px}
+h2{font-size:17px;font-weight:600;margin:18px 0 8px}
+h3{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text2)}
+.sub{font-size:13px;color:var(--text3);margin-bottom:16px}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.03em}
+.b-green{background:#0a3d2e;color:var(--accent)}
+.b-blue{background:#0a2a4d;color:var(--blue)}
+.b-purple{background:#2d1854;color:var(--purple)}
+.b-grey{background:#2a2a2a;color:var(--grey)}
+.b-red{background:#3d1a1a;color:var(--red)}
+.b-warn{background:#3d2a1a;color:var(--warn)}
+.b-today{background:var(--accent);color:#000;font-weight:700}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.day-card{display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.day-card:active{background:var(--card2)}
+.day-card.today{border:2px solid var(--accent);background:#0a1e18}
+.day-left{min-width:42px}
+.day-name{font-size:13px;font-weight:700;letter-spacing:.05em}
+.day-mid{flex:1}
+.day-type{font-size:14px;font-weight:600}
+.day-focus{font-size:12px;color:var(--text3);margin-top:2px}
+.day-arr{color:var(--text3);font-size:18px}
+.hero{background:linear-gradient(135deg,#0a2a20 0%,#0f1e18 100%);border:1px solid rgba(0,200,150,.2);border-radius:14px;padding:18px;margin-bottom:16px}
+.hero-lbl{font-size:10px;letter-spacing:.1em;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:6px}
+.hero-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.hero-sub{font-size:12px;color:var(--text2);line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--card);border-radius:10px;padding:3px;overflow-x:auto}
+.tab{flex:1;min-width:max-content;padding:9px 14px;text-align:center;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;color:var(--text3);-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.tab.active{background:var(--accent);color:#000}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.ex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.ex-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ex-head:active{background:var(--card2)}
+.ex-num{font-size:11px;font-weight:700;color:var(--accent);min-width:22px}
+.ex-info{flex:1}
+.ex-name{font-size:14px;font-weight:600}
+.ex-sets{font-size:13px;color:var(--accent);font-weight:600;margin-top:1px}
+.ex-arrow{color:var(--text3);font-size:14px;transition:transform .2s}
+.ex-card.open .ex-arrow{transform:rotate(180deg)}
+.ex-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border)}
+.ex-card.open .ex-body{display:block}
+.ex-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 6px}
+.ex-pill{font-size:11px;padding:3px 8px;border-radius:6px;background:var(--card2);color:var(--text2)}
+.ex-reason{font-size:12px;color:var(--text3);font-style:italic;margin:10px 0}
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 8px}
+.dd-col h4{font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase}
+.dd-col.do h4{color:var(--accent)}
+.dd-col.dont h4{color:var(--red)}
+.dd-item{font-size:11.5px;color:var(--text2);padding:5px 0 5px 14px;position:relative;line-height:1.5}
+.dd-col.do .dd-item::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700;font-size:11px}
+.dd-col.dont .dd-item::before{content:"✗";position:absolute;left:0;color:var(--red);font-weight:700;font-size:11px}
+.vid-btn{display:block;width:100%;padding:11px;background:#8b0000;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;text-align:center;text-decoration:none;margin-top:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vid-btn:active{opacity:.8}
+.vid-btn.small{padding:8px;font-size:12px;margin-top:8px;background:#6b0000}
+.warn-box{border-left:3px solid var(--warn);background:#2a1f14;border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.warn-box.red{border-left-color:var(--red);background:#2a1414}
+.warn-box.teal{border-left-color:var(--accent);background:#0a2a20}
+.warn-box.blue{border-left-color:var(--blue);background:#0a1a2a}
+.warn-box.purple{border-left-color:var(--purple);background:#1a0a2a}
+.warn-box .wb-title{font-size:12px;font-weight:700;margin-bottom:4px;letter-spacing:.03em}
+.warn-box.red .wb-title{color:var(--red)}
+.warn-box .wb-title{color:var(--warn)}
+.warn-box.teal .wb-title{color:var(--accent)}
+.warn-box.blue .wb-title{color:var(--blue)}
+.warn-box.purple .wb-title{color:var(--purple)}
+.warn-box p,.warn-box li{font-size:12px;color:var(--text2);line-height:1.55}
+.warn-box ul{padding-left:18px;margin-top:4px}
+.rec-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.rec-name{font-size:13px;font-weight:600}
+.rec-how{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+.rec-why{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic}
+.wu-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.wu-name{font-size:13px;font-weight:600}
+.wu-how{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+.wu-why{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic}
+.hr-box{background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:18px;text-align:center;margin-bottom:14px}
+.hr-big{font-size:34px;font-weight:700;color:var(--accent);letter-spacing:-1px}
+.hr-label{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.hr-sub{font-size:12px;color:var(--text2);margin-top:6px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--border);display:flex;padding-bottom:max(env(safe-area-inset-bottom),8px);z-index:100}
+.nav-btn{flex:1;padding:8px 2px 6px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.nav-btn.active .nav-icon,.nav-btn.active .nav-label{color:var(--accent)}
+.nav-icon{font-size:20px;display:block}
+.nav-label{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:.03em}
+.back{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--text3);cursor:pointer;margin-bottom:12px;padding:6px 0;-webkit-tap-highlight-color:transparent}
+.back:active{color:var(--accent)}
+.s-table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.s-table th{text-align:left;padding:7px 8px;background:var(--card2);color:var(--text3);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border2)}
+.s-table td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.5}
+.s-table td:first-child{font-weight:600;color:var(--text)}
+.rule-item{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.rule-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.rule-title::before{content:"⛔ ";color:var(--red)}
+.rule-title.warn::before{content:"⚠ ";color:var(--warn)}
+.rule-body{font-size:12px;color:var(--text2);line-height:1.5}
+.option-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.option-card.primary{border:2px solid var(--accent)}
+.option-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.option-title{font-size:15px;font-weight:700}
+.option-tag{font-size:10px;padding:2px 8px;border-radius:6px;background:#0a3d2e;color:var(--accent);font-weight:600}
+.option-tag.alt{background:#3d2a1a;color:var(--warn)}
+.option-list{list-style:none;padding:0}
+.option-list li{font-size:12.5px;color:var(--text2);padding:4px 0 4px 14px;position:relative;line-height:1.55}
+.option-list li::before{content:"•";position:absolute;left:0;color:var(--accent)}
+.sci-text{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px}
+.sci-text strong{color:var(--text)}
+.sci-hl{background:#0a2a20;border:1px solid rgba(0,200,150,.2);border-radius:8px;padding:12px 14px;margin:10px 0}
+.sci-hl h4{font-size:11px;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.sci-hl p{font-size:12px;color:var(--text2);line-height:1.6}
+.coll{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.coll-head{padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent}
+.coll-head:active{background:var(--card2)}
+.coll-title{font-size:14px;font-weight:600}
+.coll-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border)}
+.coll.open .coll-body{display:block}
+.coll-arrow{color:var(--text3);font-size:12px;transition:transform .2s}
+.coll.open .coll-arrow{transform:rotate(180deg)}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.compare-table th{background:var(--card2);padding:8px;font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:.05em;border-bottom:1px solid var(--border2)}
+.compare-table td{padding:8px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.55}
+.compare-table td:first-child{font-weight:600;color:var(--text);width:35%}
+.compare-table .col-str{color:var(--warn)}
+.compare-table .col-hyp{color:var(--accent)}
+.phase-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.phase-block h3{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.phase-block .ph-tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;margin-bottom:6px}
+.phase-block .ph-tag.str{background:#3d2a1a;color:var(--warn)}
+.phase-block .ph-tag.hyp{background:#0a3d2e;color:var(--accent)}
+</style>
+</head>
+<body>
+<noscript><div style="background:#ff6b35;color:#000;padding:16px;text-align:center;font-size:14px;font-weight:600">Open this file in a browser — Files app preview blocks interactions.</div></noscript>
+
+<!-- HOME / WEEK -->
+<div class="screen active" id="s-home">
+<h1>Training Protocol</h1>
+<div class="sub">Evidence-Based Redesign · 3.5-Day Split + Conditioning · July 2026</div>
+<div class="hero">
+<div class="hero-lbl" id="heroToday">Today</div>
+<div class="hero-title" id="heroTitle">—</div>
+<div class="hero-sub" id="heroSub">—</div>
+</div>
+<div id="dc"></div>
+</div>
+
+<!-- DAY SCREEN -->
+<div class="screen" id="s-day"><div class="back" onclick="ss('s-home')">← Back to Week</div><div id="dayC"></div></div>
+
+<!-- KNEE -->
+<div class="screen" id="s-knee">
+<h1>🦵 Knee &amp; Tendon</h1>
+<div class="sub">Embedded into every leg day — Mon (Lower A) &amp; Thu (Lower B)</div>
+<div class="warn-box teal"><div class="wb-title">HOW THIS WORKS NOW</div><p>Rehab is no longer a separate "3 exercises, left only" block. The evidence-based core is <strong>Heavy Slow Resistance (HSR)</strong> loading built directly into your leg-day squats and extensions, with optional isometrics and a ring of supporting work around the knee. Bilateral, with <strong>marginally more attention to the LEFT</strong>.</p></div>
+<div id="kneeC"></div>
+</div>
+
+<!-- PROTOCOLS -->
+<div class="screen" id="s-proto">
+<h1>📋 Protocols</h1>
+<div class="sub">Progression · Deload · Recovery · Nutrition</div>
+<div class="tabs">
+<div class="tab active" onclick="pt(0)">Progression</div>
+<div class="tab" onclick="pt(1)">Deload</div>
+<div class="tab" onclick="pt(2)">Recovery</div>
+<div class="tab" onclick="pt(3)">Nutrition</div>
+</div>
+<div class="tab-content active" id="pt0"></div>
+<div class="tab-content" id="pt1"></div>
+<div class="tab-content" id="pt2"></div>
+<div class="tab-content" id="pt3"></div>
+</div>
+
+<!-- SCIENCE -->
+<div class="screen" id="s-science">
+<h1>🧬 Science &amp; Reference</h1>
+<div class="sub">The evidence behind every decision — including the myths cut</div>
+<div class="tabs">
+<div class="tab active" onclick="st(0)">Volume·RIR</div>
+<div class="tab" onclick="st(1)">Cardio</div>
+<div class="tab" onclick="st(2)">Knee·Tendon</div>
+<div class="tab" onclick="st(3)">Fact-Checks</div>
+<div class="tab" onclick="st(4)">Supps·You</div>
+</div>
+<div class="tab-content active" id="sct0"></div>
+<div class="tab-content" id="sct1"></div>
+<div class="tab-content" id="sct2"></div>
+<div class="tab-content" id="sct3"></div>
+<div class="tab-content" id="sct4"></div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+<div class="nav-btn active" onclick="ss('s-home')"><span class="nav-icon">📅</span><div class="nav-label">WEEK</div></div>
+<div class="nav-btn" onclick="openToday()"><span class="nav-icon">⭐</span><div class="nav-label">TODAY</div></div>
+<div class="nav-btn" onclick="ss('s-knee')"><span class="nav-icon">🦵</span><div class="nav-label">KNEE</div></div>
+<div class="nav-btn" onclick="ss('s-proto')"><span class="nav-icon">📋</span><div class="nav-label">PROTO</div></div>
+<div class="nav-btn" onclick="ss('s-science')"><span class="nav-icon">🧬</span><div class="nav-label">SCIENCE</div></div>
+</div>
+
+<script>
+const yt = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+
+// Today detection: getDay() → 0=Sun,1=Mon...6=Sat. days array = [Mon..Sun]
+const todayIdx = (new Date().getDay() + 6) % 7;
+
+// ============ WARM-UPS ============
+const WU = {
+  easyCardio:{name:'Easy cardio — 5 min',how:'Zone 1–2 bike or row, conversational',why:'Raises core temperature before loading (Deliverable 11)',vid:'5 minute easy bike warm up'},
+  hipMob:{name:'Hip mobility',how:'Leg swings + 90/90 transitions, ~1 min',why:'Opens the hips for squat/hinge patterns',vid:'hip mobility drills 90 90 leg swings'},
+  ankleDorsi:{name:'Ankle dorsiflexion (knee-to-wall)',how:'10/side, drive knee over toes',why:'Dorsiflexion is a direct lever for knee tracking and squat depth',vid:'knee to wall ankle dorsiflexion drill'},
+  tSpine:{name:'T-spine rotation',how:'8–10/side, breathe through the rotation',why:'Restores thoracic rotation dulled by desk work',vid:'thoracic spine rotation mobility floor'},
+  shoulderPrep:{name:'Shoulder CARs + band dislocates',how:'5 slow circles/side, 10 dislocates',why:'Preps the shoulder before pressing and pulling',vid:'shoulder cars band dislocates warm up'},
+  bandPull:{name:'Band pull-apart',how:'× 15',why:'Rear delt + rhomboid activation, scapular prep',vid:'band pull apart proper form'},
+  cuffPrep:{name:'External-rotation cuff prep',how:'12/side, light band',why:'Wakes the rotator cuff before heavy pressing',vid:'rotator cuff external rotation band warm up'},
+  ramp:{name:'Movement-specific ramp',how:'2–3 progressively heavier sets of the first compound',why:'Grooves the pattern and primes force output (never a cold heavy first set)',vid:'warm up ramp sets before working set'},
+  spanishPot:{name:'Spanish-squat isometric (doubles as potentiator)',how:'5 × 45 s @ ~70% MVIC, 2 min rest',why:'On knee days this warms the patellar tendon and can potentiate the session',vid:'spanish squat isometric hold form'}
+};
+
+// ============ EXERCISES ============
+const EX = {
+  // --- LOWER A: quad / knee focus ---
+  spanishIso:{name:'Spanish-Squat Isometric (optional)',group:'Knee / Quad',eq:'Heavy band behind knees',sets:'5 × 45 s @ ~70% MVIC',rest:'2 min',target:'Patellar tendon (analgesia + potentiation)',tempo:'Isometric hold',
+    reason:'Optional pain-modulation and patellar-tendon loader. Upright torso reaches ~70% MVIC (a wall-sit only ~60%). Honest note: the analgesia effect is real but comes from small samples and replicates inconsistently — use it if it helps YOU, it is not a required milestone.',
+    doCues:['Band anchored behind the knees, shins vertical','Torso upright, weight through mid-foot','Hold a steady ~70% effort — hard but sustainable for 45 s','Breathe normally throughout'],
+    dontCues:['Don\'t let the torso pitch forward (turns it into a hinge)','Don\'t hold your breath','Don\'t chase pain — ease off if >3/10','Don\'t place it right before a heavy set if it leaves you fatigued'],
+    vid:'spanish squat isometric hold physio'},
+  hackPendulum:{name:'Hack Squat or Pendulum Squat (HSR tempo)',group:'Legs (Quad)',eq:'Hack / pendulum machine',sets:'4 × 6–8',rest:'3 min',target:'Quads + patellar tendon',tempo:'3 s down / 3 s up (HSR)',rir:'2–3 RIR',
+    reason:'Primary knee-extensor tendon loader. Upright torso, minimal spinal load, controlled deep flexion. The 3 s/3 s Heavy Slow Resistance tempo drives tendon collagen turnover (Kongsgaard 2009).',
+    doCues:['3 s lowering, 3 s lifting — the tempo IS the medicine','Controlled depth your knee tolerates (≤3/10 pain)','Drive through the whole foot','Progress load across the block: ~15RM → 6RM'],
+    dontCues:['Don\'t bounce out of the bottom','Don\'t chase depth if pain spikes','Don\'t rush the tempo to add weight','Don\'t let knees cave inward'],
+    vid:'hack squat slow tempo proper form'},
+  legPress:{name:'Leg Press',group:'Legs (Quad/Glute)',eq:'Leg press',sets:'3 × 10–12',rest:'2–3 min',target:'Quads + glutes',tempo:'Controlled',rir:'1–2 RIR',
+    reason:'Broad, spine-sparing quad/glute loader after the primary HSR movement.',
+    doCues:['Mid-plate, shoulder-width feet','Lower back stays in contact with the pad','Lower to a depth the knee tolerates','3 s controlled lowering'],
+    dontCues:['Don\'t place feet too low (knee shear)','Don\'t let the lower back peel off the pad','Don\'t let knees collapse inward','Don\'t drop the sled'],
+    vid:'leg press proper form tutorial'},
+  legExt:{name:'Seated Leg Extension (long-length emphasis)',group:'Legs (Quad)',eq:'Leg extension machine',sets:'3 × 12–15',rest:'2 min',target:'Quads + patellar tendon',tempo:'Controlled, pause at stretch',rir:'~1 RIR',
+    reason:'Direct quad + patellar-tendon work; the deep, long-length position is where stretch-mediated growth is strongest.',
+    doCues:['Full range, emphasise the deep/stretched start','Pause briefly at the bottom','Squeeze at the top without snapping the knee','Slightly more volume/attention on the LEFT'],
+    dontCues:['Don\'t swing or use momentum','Don\'t hyperextend at lockout','Don\'t half-rep the stretched portion','Don\'t push into >3/10 knee pain'],
+    vid:'seated leg extension long length form'},
+  rdl:{name:'Romanian Deadlift',group:'Legs (Posterior)',eq:'Barbell / dumbbells',sets:'3 × 8–10',rest:'2–3 min',target:'Hamstrings + erectors',tempo:'3–4 s eccentric',rir:'~2 RIR',
+    reason:'Hip-hinge hamstring and erector loading to balance the quad-dominant day.',
+    doCues:['Push the hips BACK — trace the bar down the legs','Feel the hamstring stretch at the bottom','Neutral spine, chest tall','Drive hips forward to stand'],
+    dontCues:['Don\'t squat it down','Don\'t round the upper back','Don\'t go deeper than hamstring flexibility allows','Don\'t yank with the lower back'],
+    vid:'romanian deadlift proper form'},
+  calfStanding:{name:'Standing Calf Raise (straight-leg — gastrocnemius)',group:'Calves',eq:'Standing calf machine',sets:'4 × 8–12',rest:'90 s',target:'Gastrocnemius',tempo:'Pause top + bottom',rir:'~1 RIR',
+    reason:'Straight knee puts the biarticular gastrocnemius under tension (bent-knee shifts to soleus). Well-established EMG finding.',
+    doCues:['Knees straight (not locked hard)','Full stretch at the bottom, full squeeze at the top','1 s pause each end','Controlled tempo'],
+    dontCues:['Don\'t bounce the reps','Don\'t bend the knees (that\'s the seated version)','Don\'t cut the range short','Don\'t rush'],
+    vid:'standing calf raise gastrocnemius form'},
+  tibRaise:{name:'Tibialis Raise',group:'Lower leg (shin)',eq:'Wall / tib bar',sets:'3 × 15–20',rest:'60 s',target:'Tibialis anterior',tempo:'Controlled',
+    reason:'Ankle stability, deceleration capacity, and knee off-loading. Mechanistically sound; direct outcome evidence is limited but the cost is trivial.',
+    doCues:['Heels planted, pull the toes up toward the shin','Full controlled range','Squeeze the shin at the top'],
+    dontCues:['Don\'t rock the body to cheat','Don\'t rush the lowering','Don\'t bend at the hips'],
+    vid:'tibialis raise wall form'},
+  hangingLeg:{name:'Hanging Leg Raise / Core',group:'Core',eq:'Pull-up bar',sets:'3 × 10–15',rest:'60 s',target:'Rectus abdominis + hip flexors',tempo:'Controlled',
+    reason:'Direct trunk flexion / anti-swing core to finish the day.',
+    doCues:['Control the lowering — no swing','Posteriorly tilt the pelvis at the top','Full but controlled range'],
+    dontCues:['Don\'t kip or swing','Don\'t drop the legs fast','Don\'t hold your breath'],
+    vid:'hanging leg raise proper form'},
+
+  // --- UPPER A: horizontal push/pull ---
+  bench:{name:'Barbell or Machine Bench Press',group:'Chest',eq:'Barbell / press machine',sets:'4 × 5–8',rest:'3 min',target:'Sternal + upper pec, triceps',tempo:'Controlled eccentric',rir:'2–3 RIR',
+    reason:'Primary horizontal press — heaviest, lowest-RIR work first while fresh.',
+    doCues:['Shoulder blades retracted and down','Bar/handles to mid-chest, full range','Controlled lowering, drive up','Feet planted, slight arch'],
+    dontCues:['Don\'t flare elbows to 90°','Don\'t bounce off the chest','Don\'t half-rep','Don\'t hold your breath at load'],
+    vid:'barbell bench press proper form'},
+  csRow:{name:'Chest-Supported Row',group:'Back (Mid)',eq:'Chest-supported row',sets:'4 × 8–10',rest:'2–3 min',target:'Rhomboids + mid traps + lats',tempo:'2 s squeeze',rir:'1–2 RIR',
+    reason:'Horizontal pull for mid-back thickness with the chest supported (no lower-back cheat).',
+    doCues:['Initiate with the shoulder blades','Row to the lower ribcage','2 s squeeze at the top','Chest stays on the pad'],
+    dontCues:['Don\'t heave with the torso','Don\'t start with the arms','Don\'t shrug up','Don\'t cut the range'],
+    vid:'chest supported row proper form'},
+  inclineDbPress:{name:'Incline Dumbbell Press',group:'Chest (Upper)',eq:'Dumbbells, 30–45°',sets:'3 × 8–12',rest:'2 min',target:'Upper pec',tempo:'Controlled',rir:'1–2 RIR',
+    reason:'Upper-chest emphasis in a hypertrophy range.',
+    doCues:['30–45° bench','Full range — deep stretch at the bottom','Press slightly inward at the top','Shoulder blades set'],
+    dontCues:['Don\'t let the shoulders shrug forward','Don\'t clank the dumbbells at the top','Don\'t half-rep the stretch','Don\'t arch off the bench'],
+    vid:'incline dumbbell press proper form'},
+  pulldown:{name:'Lat Pulldown or Pull-Up',group:'Back (Lats)',eq:'Cable / bar',sets:'3 × 8–12',rest:'2 min',target:'Lats',tempo:'2 s stretch',rir:'1–2 RIR',
+    reason:'Vertical pull for lat width.',
+    doCues:['Depress the shoulders before pulling','Drive elbows to the hip pockets','Full stretch at the top','Pull to the upper chest'],
+    dontCues:['Don\'t start with shoulders at the ears','Don\'t heave back excessively','Don\'t strangle the bar','Don\'t pull past the collarbone'],
+    vid:'lat pulldown proper form'},
+  lateralRaise:{name:'Cable Lateral Raise',group:'Shoulders (Side)',eq:'Cable low pulley',sets:'3 × 12–20',rest:'60 s',target:'Lateral delt',tempo:'Controlled',rir:'0–1 RIR',
+    reason:'Constant-tension side-delt work; small muscle, responds to volume — taken close to failure.',
+    doCues:['Lead with the elbow — "pour the jug"','Raise to shoulder height','Slight forward torso lean','2 s at the top, controlled lower'],
+    dontCues:['Don\'t pull with the hand','Don\'t go above shoulder height','Don\'t swing or shrug','Don\'t drop fast'],
+    vid:'cable lateral raise single arm form'},
+  ohTricep:{name:'Overhead Cable Triceps Extension (long head)',group:'Arms (Triceps)',eq:'Cable + rope',sets:'3 × 10–15',rest:'90 s',target:'Triceps long head (stretched)',tempo:'2 s stretch',rir:'1–2 RIR',
+    reason:'The overhead / long-length position grew the long head ~1.5× more than the neutral position (Maeo et al. 2023: +28.5% vs +19.6%).',
+    doCues:['Get a deep stretch behind the head','Keep the elbows fairly fixed','Full lockout without flaring','Controlled eccentric'],
+    dontCues:['Don\'t let the elbows drift wide','Don\'t cut the overhead stretch','Don\'t use momentum','Don\'t rush'],
+    vid:'overhead cable triceps extension form'},
+  inclineCurl:{name:'Incline Dumbbell Curl (stretched long head)',group:'Arms (Biceps)',eq:'Dumbbells, incline bench',sets:'3 × 10–12',rest:'90 s',target:'Biceps long head',tempo:'2 s stretch',rir:'1–2 RIR',
+    reason:'Arms hanging back on an incline puts the biceps long head in a stretched position — strong hypertrophy stimulus.',
+    doCues:['Let the arms hang back behind the torso','Full stretch at the bottom','Curl without swinging the elbows forward','Controlled lower'],
+    dontCues:['Don\'t swing the elbows up','Don\'t cut the stretch','Don\'t heave the weight','Don\'t half-rep'],
+    vid:'incline dumbbell curl proper form'},
+  facePullCuff:{name:'Face Pull + External-Rotation Cuff',group:'Shoulders (Rear) + Cuff',eq:'Cable eye level',sets:'3 × 15–20',rest:'60 s',target:'Rear delt + rotator cuff',tempo:'2 s hold',
+    reason:'Rear-delt and rotator-cuff balance work to close the shoulder-health gap.',
+    doCues:['Elbows high, pull to the face/ears','Externally rotate at the finish','2 s squeeze','Light, controlled load'],
+    dontCues:['Don\'t drop the elbows (becomes a row)','Don\'t just pull straight back','Don\'t go heavy and cheat','Don\'t rush'],
+    vid:'face pull external rotation proper form'},
+
+  // --- UPPER B: vertical push/pull ---
+  ohp:{name:'Overhead Press (standing or seated)',group:'Shoulders (Front)',eq:'Barbell / dumbbells',sets:'4 × 5–8',rest:'3 min',target:'Front delts + triceps',tempo:'Controlled',rir:'2–3 RIR',
+    reason:'Primary vertical press — heaviest work first while fresh.',
+    doCues:['Brace the core, glutes tight','Press in a slight arc, finish over the crown','Full lockout','Bar/dumbbells travel close to the face'],
+    dontCues:['Don\'t overarch the lower back','Don\'t press around the head','Don\'t half-lock','Don\'t hold your breath at load'],
+    vid:'overhead press proper form'},
+  weightedPullup:{name:'Weighted Pull-Up or Pulldown',group:'Back (Lats)',eq:'Bar / belt',sets:'4 × 6–10',rest:'3 min',target:'Lats',tempo:'2 s stretch',rir:'1–2 RIR',
+    reason:'Loaded vertical pull for lat strength and size.',
+    doCues:['Full dead-hang stretch at the bottom','Drive the elbows down and back','Chest to the bar','Control the lowering'],
+    dontCues:['Don\'t kip','Don\'t cut the range at the top','Don\'t shrug at the bottom','Don\'t drop fast'],
+    vid:'weighted pull up proper form'},
+  dip:{name:'Dip or Decline Press (lower chest)',group:'Chest (Lower)',eq:'Dip bars / decline',sets:'3 × 8–12',rest:'2 min',target:'Lower pec + triceps',tempo:'Controlled',rir:'1–2 RIR',
+    reason:'Lower-chest and triceps loading in a hypertrophy range.',
+    doCues:['Slight forward lean for chest bias','Controlled depth (shoulder-comfortable)','Full lockout at the top','Shoulders packed down'],
+    dontCues:['Don\'t drop below a comfortable shoulder range','Don\'t bounce at the bottom','Don\'t flare hard','Don\'t shrug up'],
+    vid:'chest dip proper form'},
+  cableRow:{name:'Cable Row Variation',group:'Back (Mid)',eq:'Cable row',sets:'3 × 10–12',rest:'2 min',target:'Rhomboids + mid-back',tempo:'2 s squeeze',rir:'1–2 RIR',
+    reason:'Second horizontal-pull angle for mid-back completeness on the vertical day.',
+    doCues:['Squeeze the blades first','Row to the navel','2 s hold at the finish','Upright torso'],
+    dontCues:['Don\'t rock','Don\'t start with the arms','Don\'t let the cable snap forward','Don\'t round over'],
+    vid:'seated cable row proper form'},
+  shrug:{name:'Shrug',group:'Back (Traps)',eq:'Dumbbells / bar',sets:'3 × 10–15',rest:'90 s',target:'Upper traps',tempo:'2 s hold',rir:'1–2 RIR',
+    reason:'Direct upper-trap work to close coverage.',
+    doCues:['Shrug straight up toward the ears','2 s hold at the top','Full controlled lower'],
+    dontCues:['Don\'t roll the shoulders','Don\'t use momentum','Don\'t cut the range'],
+    vid:'dumbbell shrug proper form'},
+  curlCombo:{name:'EZ-Bar / Preacher Curl + Hammer Curl',group:'Arms (Biceps/Brachialis)',eq:'EZ bar + dumbbells',sets:'3 × 10–12 each',rest:'90 s',target:'Biceps + brachialis + brachioradialis',tempo:'Controlled',rir:'1–2 RIR',
+    reason:'Covers the elbow flexors from two angles (supinated + neutral).',
+    doCues:['Full range on both','Controlled eccentric','Elbows steady','Hammer grip stays neutral'],
+    dontCues:['Don\'t swing','Don\'t half-rep','Don\'t let the elbows drift','Don\'t heave'],
+    vid:'ez bar curl hammer curl form'},
+  pushdown:{name:'Rope Pushdown or Skullcrusher',group:'Arms (Triceps)',eq:'Cable / EZ bar',sets:'3 × 10–15',rest:'90 s',target:'Triceps (lateral/medial)',tempo:'Controlled',rir:'1–2 RIR',
+    reason:'Direct triceps volume complementing the overhead work.',
+    doCues:['Elbows pinned','Full lockout','Controlled return'],
+    dontCues:['Don\'t let the elbows flare and drift','Don\'t use body english','Don\'t half-lock'],
+    vid:'rope pushdown proper form'},
+
+  // --- LOWER B: hip / hamstring focus ---
+  bulgarian:{name:'Bulgarian Split Squat or Walking Lunge',group:'Legs (Single-leg)',eq:'Dumbbells + bench',sets:'3 × 8–10 / leg',rest:'2 min',target:'Quads + glutes + stability',tempo:'Controlled',rir:'~2 RIR',
+    reason:'Single-leg stability and quad/glute loading — also a knee-tracking driver. LEFT leg leads.',
+    doCues:['LEFT leg first','Front shin roughly vertical, controlled depth','Torso tall (glute) or slight lean (quad)','Drive through the front heel'],
+    dontCues:['Don\'t let the front knee cave in','Don\'t push off the back foot','Don\'t rush','Don\'t exceed >3/10 knee pain'],
+    vid:'bulgarian split squat proper form'},
+  hipThrust:{name:'Hip Thrust or Belt Squat',group:'Glutes',eq:'Barbell / belt-squat',sets:'3 × 8–12',rest:'2 min',target:'Glute max',tempo:'2 s hold top',rir:'1–2 RIR',
+    reason:'Direct glute-max loading with minimal knee stress.',
+    doCues:['Upper back on the bench, chin tucked','Drive through the heels','Full lockout — straight line knees to shoulders','2 s squeeze at the top'],
+    dontCues:['Don\'t hyperextend the lower back','Don\'t let the neck take load','Don\'t push through the toes','Don\'t bounce'],
+    vid:'barbell hip thrust proper form'},
+  legCurl:{name:'Seated / Lying Leg Curl',group:'Legs (Hamstrings)',eq:'Leg curl machine',sets:'3 × 10–12',rest:'90 s',target:'Hamstrings (knee flexion)',tempo:'3 s eccentric',rir:'1–2 RIR',
+    reason:'Hamstring isolation via knee flexion; the seated version biases the stretched position.',
+    doCues:['Hips down on the pad','Full range','3 s controlled lowering','Feet neutral'],
+    dontCues:['Don\'t let the hips lift','Don\'t drop the weight','Don\'t half-rep'],
+    vid:'seated leg curl proper form'},
+  nordic:{name:'Nordic Hamstring Curl (eccentric)',group:'Legs (Hamstrings)',eq:'Anchor + pad',sets:'3 × 5–8',rest:'2 min',target:'Hamstrings (eccentric)',tempo:'Slow lower',
+    reason:'Eccentric hamstring strength — strong injury-prevention evidence and posterior knee stabilisation.',
+    doCues:['Lower as slowly as you can control','Hips extended, straight line knees-to-shoulders','Catch with the hands, push back up','Add range as you get stronger'],
+    dontCues:['Don\'t bend at the hips to cheat','Don\'t drop suddenly','Don\'t start with full range if you can\'t control it'],
+    vid:'nordic hamstring curl proper form'},
+  abdCopen:{name:'Hip Abduction + Copenhagen Adduction',group:'Hips (Glute med / adductors)',eq:'Cable/machine + bench',sets:'3 × 12–15 / 3 × 6–10',rest:'60–90 s',target:'Glute med + adductors (knee support)',tempo:'Controlled',
+    reason:'Lateral hip and groin stability supporting the knee. Bilateral, marginally more on the LEFT.',
+    doCues:['Abduction: move from the hip, foot flexed','Copenhagen: regress to short-lever if needed','LEFT side leads','Controlled tempo, 2 s hold'],
+    dontCues:['Don\'t hip-hike on abduction','Don\'t collapse on the Copenhagen','Don\'t rush','Don\'t push a painful groin'],
+    vid:'copenhagen adduction hip abduction form'},
+  calfSeated:{name:'Seated Calf Raise (bent-knee — soleus)',group:'Calves',eq:'Seated calf machine',sets:'4 × 12–15',rest:'90 s',target:'Soleus',tempo:'Pause top + bottom',rir:'~1 RIR',
+    reason:'Bent knee places the gastroc in active insufficiency, shifting load to the soleus — a knee stabiliser and commonly neglected.',
+    doCues:['Knees bent ~90°','Full stretch at the bottom, full squeeze at the top','1 s pause each end'],
+    dontCues:['Don\'t bounce','Don\'t cut the range','Don\'t rush'],
+    vid:'seated calf raise soleus form'},
+  pallof:{name:'Pallof Press + Oblique / TVA Work',group:'Core (Anti-rotation)',eq:'Cable chest height',sets:'3 × 10–12 / side',rest:'60 s',target:'Obliques + transverse abdominis',tempo:'2 s hold',
+    reason:'Anti-rotation core and deep trunk stability.',
+    doCues:['Stand perpendicular to the cable','Brace before pressing out','2 s hold fully extended','Both sides equal'],
+    dontCues:['Don\'t let the torso rotate','Don\'t press then brace','Don\'t snap back','Don\'t favour the easy side'],
+    vid:'pallof press proper form'},
+
+  // --- HALF DAY (Sat) ---
+  wristCurl:{name:'Wrist Curl / Reverse Wrist Curl',group:'Forearms',eq:'Dumbbells / bar',sets:'3 × 15',rest:'45 s',target:'Forearm flexors + extensors',tempo:'Controlled',
+    reason:'Direct forearm coverage.',
+    doCues:['Forearms braced on a bench','Full flexion and extension','Controlled tempo'],
+    dontCues:['Don\'t bounce','Don\'t use momentum','Don\'t half-rep'],
+    vid:'wrist curl reverse wrist curl form'},
+  calfCombo:{name:'Standing + Seated Calf Raise',group:'Calves',eq:'Calf machines',sets:'3 sets each',rest:'60–90 s',target:'Gastrocnemius + soleus',tempo:'Pause each end',
+    reason:'Both calf heads on the accessory day (standing = gastroc, seated = soleus).',
+    doCues:['Full stretch and squeeze','1 s pause each end','Standing straight-knee, seated bent-knee'],
+    dontCues:['Don\'t bounce','Don\'t cut the range'],
+    vid:'calf raise gastrocnemius soleus form'},
+  neck:{name:'Neck Flexion / Extension (optional)',group:'Neck',eq:'Harness / manual',sets:'2–3 × 15',rest:'60 s',target:'Neck flexors/extensors',tempo:'Slow',
+    reason:'Optional — include only for contact-sport or athletic goals.',
+    doCues:['Slow, controlled range','Light load to start','Support with the hand if using manual resistance'],
+    dontCues:['Don\'t jerk the neck','Don\'t go heavy early','Don\'t force end-range'],
+    vid:'neck training harness beginner form'},
+  carry:{name:'Weighted Carry (grip)',group:'Grip / Posterior',eq:'Heavy dumbbells',sets:'3 × 30–40 m',rest:'90 s',target:'Grip + trunk + posterior chain',tempo:'Steady walk',
+    reason:'Grip, trunk, and postural loading to finish.',
+    doCues:['Tall chest, shoulders packed','Crush the handles','Steady controlled pace'],
+    dontCues:['Don\'t round the upper back','Don\'t rush','Don\'t let the shoulders shrug up'],
+    vid:'farmers carry proper form'},
+  coreCircuit:{name:'Core Circuit',group:'Core',eq:'Floor / cable',sets:'10–15 min',rest:'—',target:'Obliques + TVA + erectors',tempo:'Controlled',
+    reason:'Rotational, anti-extension, and erector work to round out the trunk.',
+    doCues:['Mix Pallof, dead-bug, side-plank, back-extension','Quality over speed','Breathe through each rep'],
+    dontCues:['Don\'t rush for time','Don\'t let the lower back arch on anti-extension work','Don\'t hold your breath'],
+    vid:'core circuit obliques tva routine'}
+};
+
+// ============ FOCUS BLOCKS ============
+const STR_BLOCK = `<div class="warn-box purple"><div class="wb-title">TODAY: STRENGTH-LEANING</div><p><strong>Heavy compound first, while fresh.</strong> 3–6 reps at 1–3 RIR (RPE 7–9), 3–5 min rest. Leave 1–3 reps in the tank — grinding every set to true failure adds little hypertrophy and costs recovery (Refalo 2023). Max strength is comparatively insensitive to how close you push.</p><p style="margin-top:6px"><strong>RIR = reps in reserve.</strong> "2 RIR" means you stop when you could have done ~2 more clean reps.</p></div>`;
+
+const HYP_BLOCK = `<div class="warn-box teal"><div class="wb-title">TODAY: HYPERTROPHY</div><p><strong>6–15 reps at 1–3 RIR, 2–3 min rest.</strong> Volume is the primary driver — the goal across the week is roughly 10–20 hard sets per muscle. Most isolation is taken closer to failure (~1–2 RIR); the big compounds stay at 2–3 RIR.</p></div>`;
+
+const HSR_BLOCK = `<div class="warn-box teal"><div class="wb-title">KNEE / TENDON FOCUS TODAY</div><p><strong>HSR tempo — 3 s down / 3 s up</strong> on the primary knee-extension movement drives tendon collagen turnover. Progress load across the block from ~15RM toward 6RM.</p><p style="margin-top:6px"><strong>Pain rule:</strong> ≤3/10 during the work, settling within 24 h. If a single-leg decline squat is >3/10 the next day, drop one load tier and hold.</p><p style="margin-top:6px">The Spanish-squat isometric is optional — use it as a pre-session potentiator or a finisher if it helps you.</p></div>`;
+
+// ============ DAYS ============
+const days = [
+// MON — Lower A
+{idx:0,n:'MON',t:'Monday — Lower A (Quad / Knee focus)',badge:'b-green',focus:'Quads + integrated tendon loading',
+warmup:[WU.easyCardio,WU.hipMob,WU.ankleDorsi,WU.spanishPot,WU.ramp],
+hasRehab:true,
+mainTitle:'Lower A',mainFocus:STR_BLOCK+HSR_BLOCK,
+exercises:[EX.spanishIso,EX.hackPendulum,EX.legPress,EX.legExt,EX.rdl,EX.calfStanding,EX.tibRaise,EX.hangingLeg],
+recovery:[
+  {name:'Protein + carbs within ~60 min',how:'~0.4 g/kg protein + carbs',why:'Supports recovery; MPS is time- not sleep-state-dependent'},
+  {name:'Collagen already done pre-session',how:'15 g collagen + ~50 mg vit C, 30–60 min BEFORE knee work',why:'Doubles collagen synthesis markers around loading (Shaw 2017)'},
+  {name:'Note the 24-h knee response',how:'Single-leg decline squat tomorrow ≤3/10',why:'Governs whether load progresses'},
+  {name:'Sleep 7–9 h',how:'Consistent schedule',why:'The single biggest recovery lever'}
+]},
+
+// TUE — Upper A + Zone 2 (separate block)
+{idx:1,n:'TUE',t:'Tuesday — Upper A + Zone 2',badge:'b-blue',focus:'Horizontal push/pull · Zone 2 in a separate block',
+warmup:[WU.easyCardio,WU.tSpine,WU.shoulderPrep,WU.cuffPrep,WU.ramp],
+mainTitle:'Upper A',mainFocus:STR_BLOCK,
+exercises:[EX.bench,EX.csRow,EX.inclineDbPress,EX.pulldown,EX.lateralRaise,EX.ohTricep,EX.inclineCurl,EX.facePullCuff],
+zone2:true,zone2Machine:'bike',
+recovery:[
+  {name:'Separate Zone 2 from the lift',how:'≥6 h apart if possible; if same block, cardio AFTER lifting',why:'Protects lower-body dynamic strength; interference is trivial for size/strength anyway'},
+  {name:'Protein across the day',how:'1.6–2.2 g/kg total, 3–5 feedings',why:'Distribution supports MPS'},
+  {name:'Shoulder / pec mobility',how:'Doorway pec + cross-body, 30 s each',why:'After pressing volume'}
+]},
+
+// WED — Norwegian 4x4 (the 0.5 day)
+{idx:2,n:'WED',t:'Wednesday — Norwegian 4×4 (the ½ day)',badge:'b-purple',focus:'VO2max · knee-friendly modality',
+fourByFour:true,
+recovery:[
+  {name:'Don\'t sit immediately',how:'Walk 5 min after the cooldown',why:'Prevents post-interval blood pooling'},
+  {name:'Optional easy mobility',how:'10 min hips / t-spine',why:'This is the light day'},
+  {name:'Full meal within ~1 h',how:'Protein + carbs',why:'Refuel the hardest cardio session'},
+  {name:'Skip this session during deload weeks',how:'Shorten or drop',why:'Deload guidance'}
+]},
+
+// THU — Lower B
+{idx:3,n:'THU',t:'Thursday — Lower B (Hip / Hamstring focus)',badge:'b-green',focus:'Posterior chain + integrated tendon loading',
+warmup:[WU.easyCardio,WU.hipMob,WU.ankleDorsi,WU.spanishPot,WU.ramp],
+hasRehab:true,
+mainTitle:'Lower B',mainFocus:STR_BLOCK+HSR_BLOCK,
+exercises:[EX.spanishIso,EX.bulgarian,EX.hipThrust,EX.legCurl,EX.nordic,EX.abdCopen,EX.calfSeated,EX.pallof],
+recovery:[
+  {name:'Protein + carbs within ~60 min',how:'~0.4 g/kg protein + carbs',why:'Recovery from posterior-chain load'},
+  {name:'Collagen pre-session, as on Monday',how:'15 g + ~50 mg vit C before tendon work',why:'Collagen synthesis around loading'},
+  {name:'Note the 24-h knee response',how:'≤3/10 next day',why:'Governs load progression'},
+  {name:'Hamstring may be sore from Nordics',how:'Expect DOMS the first few weeks',why:'Eccentric-specific soreness'}
+]},
+
+// FRI — Upper B
+{idx:4,n:'FRI',t:'Friday — Upper B (Vertical push/pull)',badge:'b-green',focus:'Overhead press + vertical pull',
+warmup:[WU.easyCardio,WU.tSpine,WU.shoulderPrep,WU.cuffPrep,WU.ramp],
+mainTitle:'Upper B',mainFocus:STR_BLOCK,
+exercises:[EX.ohp,EX.weightedPullup,EX.dip,EX.cableRow,EX.lateralRaise,EX.shrug,EX.curlCombo,EX.pushdown],
+recovery:[
+  {name:'Protein + carbs',how:'25–40 g protein post-session',why:'MPS support'},
+  {name:'Overhead / lat mobility',how:'Lat hang + doorway pec, 30 s each',why:'After overhead volume'},
+  {name:'Sleep 7–9 h',how:'Consistent schedule',why:'Primary recovery lever'}
+]},
+
+// SAT — Half day + Zone 2
+{idx:5,n:'SAT',t:'Saturday — Half Day + Zone 2',badge:'b-blue',focus:'Arms · delts · calves · neck · core · Zone 2',
+warmup:[WU.easyCardio,WU.shoulderPrep,WU.bandPull],
+mainTitle:'Half Day',mainFocus:HYP_BLOCK,
+exercises:[EX.lateralRaise,EX.ohTricep,EX.inclineCurl,EX.wristCurl,EX.calfCombo,EX.neck,EX.carry,EX.coreCircuit],
+zone2:true,zone2Machine:'treadmill',
+recovery:[
+  {name:'Separate Zone 2 from the lift',how:'≥6 h apart, or cardio after the lift',why:'Same rule as Tuesday'},
+  {name:'Protein across the day',how:'1.6–2.2 g/kg total',why:'Weekly target'},
+  {name:'Full recovery tomorrow',how:'Sunday is complete rest',why:'One full rest day is preserved'}
+]},
+
+// SUN — Rest
+{idx:6,n:'SUN',t:'Sunday — Complete Rest',badge:'b-grey',focus:'Full rest + optional walk + sleep',restDay:true,
+recovery:[
+  {name:'Complete rest',how:'No training load today',why:'One full rest day locks in adaptation'},
+  {name:'Optional easy walk',how:'20–30 min flat if you want to move',why:'Gentle circulation, not required'},
+  {name:'Sleep 7–9 h',how:'Consistent schedule',why:'Biggest recovery lever'},
+  {name:'Weekly self-check',how:'Knee 24-h response · sleep · resting HR · lift progress',why:'Flags whether to deload or adjust load'}
+]}
+];
+
+// ============ KNEE / TENDON SYSTEM (main screen) ============
+const kneeSystem = `
+<h2>The Core — Heavy Slow Resistance</h2>
+<div class="rec-card"><div class="rec-name">HSR on squat-pattern + leg extension</div><div class="rec-how">3 s down / 3 s up, progressing ~15RM → 6RM across the 12-week block. Built into Mon (hack/pendulum + extension) and Thu.</div><div class="rec-why">Kongsgaard 2009: HSR matched eccentric training on pain/function but produced superior collagen turnover, less neovascularisation, and 70% vs 22% patient satisfaction at 6 months. Recent network meta-analyses find nothing statistically superior to HSR.</div></div>
+
+<h2>Optional — Isometrics</h2>
+<div class="rec-card"><div class="rec-name">Spanish-squat isometric</div><div class="rec-how">5 × 45 s @ ~70% MVIC. Use as a pre-session potentiator or a finisher.</div><div class="rec-why">Honest framing: the acute analgesia effect is genuine but comes from very small samples (the famous study was n=6) and replicates inconsistently. Use it if it helps you — it is NOT a required milestone.</div></div>
+
+<h2>The Supporting Ring</h2>
+<div class="rec-card"><div class="rec-name">Glute med — hip abduction</div><div class="rec-how">3 × 12–15, LEFT leads</div><div class="rec-why">Lateral hip stability supporting the knee</div></div>
+<div class="rec-card"><div class="rec-name">Adductors — Copenhagen</div><div class="rec-how">3 × 6–10, regress the lever as needed</div><div class="rec-why">Groin/medial stability</div></div>
+<div class="rec-card"><div class="rec-name">Hamstrings — Nordic + curls</div><div class="rec-how">Nordic 3 × 5–8 eccentric + curls 3 × 10–12</div><div class="rec-why">Posterior knee stabilisation + injury prevention</div></div>
+<div class="rec-card"><div class="rec-name">Tibialis anterior — tib raise</div><div class="rec-how">3 × 15–20</div><div class="rec-why">Ankle stability + deceleration, off-loads the knee</div></div>
+<div class="rec-card"><div class="rec-name">Calves — standing + seated</div><div class="rec-how">Gastroc (straight-knee) + soleus (bent-knee)</div><div class="rec-why">Soleus is a knee stabiliser and commonly neglected</div></div>
+<div class="rec-card"><div class="rec-name">Single-leg balance + carries</div><div class="rec-how">In warm-ups and the half day</div><div class="rec-why">Proprioception + ankle/foot stability</div></div>
+
+<div class="warn-box"><div class="wb-title">THE PAIN RULE</div><p>≤3/10 during the exercise, settling within 24 h. Single-leg decline squat >3/10 the next day → drop one load tier and hold progression.</p></div>
+
+<div class="warn-box red"><div class="wb-title">⛔ DEFERRED UNTIL CRITERIA MET</div><p>No ballistic / plyometric / energy-storage knee loading until single-leg press ~150% bodyweight is pain-free. Advance the tendon track only when the 24-h response allows.</p></div>
+
+<div class="warn-box teal"><div class="wb-title">TREAT THE PERSON, NOT THE SCAN</div><p>Imaging abnormalities are common and poorly predictive — symptoms can improve without structural change (van Ark 2018). Load the whole kinetic chain, monitor the 24-h response, progress on how it feels and functions. Bilateral, with marginally more attention to the LEFT.</p></div>
+
+<div class="warn-box purple"><div class="wb-title">CLEAR WITH YOUR PHYSIO</div><p>This assumes you can already squat, split-squat, lunge, and leg-press with tolerable symptoms. Tendon-loading progression should be overseen by a physiotherapist.</p></div>
+`;
+
+// Short per-day rehab tab
+const kneeDay = `
+<div class="warn-box teal"><div class="wb-title">TENDON WORK IS BUILT INTO TODAY</div><p>Your HSR squat/extension and the supporting-ring lifts (calves, tibialis, hip/adductor, hamstring) ARE the rehab. No separate block.</p></div>
+<div class="rec-card"><div class="rec-name">Optional first: Spanish-squat isometric</div><div class="rec-how">5 × 45 s @ ~70% MVIC</div><div class="rec-why">Potentiation / analgesia — optional</div></div>
+<div class="rec-card"><div class="rec-name">HSR tempo on the main knee-extension movement</div><div class="rec-how">3 s down / 3 s up</div><div class="rec-why">Collagen turnover</div></div>
+<div class="rec-card"><div class="rec-name">Pain rule</div><div class="rec-how">≤3/10 during, settled within 24 h</div><div class="rec-why">Governs load</div></div>
+<div class="rec-card"><div class="rec-name">LEFT leads on every unilateral movement</div><div class="rec-how">Marginally more attention to the left</div></div>
+<a class="vid-btn" href="${yt('heavy slow resistance patellar tendon rehab')}" target="_blank">▶ Video — Heavy Slow Resistance explained</a>
+`;
+
+// ============ RULES ============
+const rules = [
+  {t:'Heavy compound / lowest-RIR work FIRST',w:false,d:'While fresh — better force output, movement quality, and safety.'},
+  {t:'HSR tempo (3 s / 3 s) on primary knee-extension',w:false,d:'Mon + Thu. Drives tendon collagen turnover; progress ~15RM → 6RM across the block.'},
+  {t:'Knee pain rule: ≤3/10, settled in 24 h',w:false,d:'Single-leg decline squat >3/10 next day → drop one load tier, hold progression.'},
+  {t:'Isometrics before or separate — never a fatiguing pre-lift',w:false,d:'Spanish squat as potentiator or finisher, not immediately before a heavy set if it would create fatigue.'},
+  {t:'Separate cardio from lifting by ≥6 h',w:false,d:'When same session, cardio AFTER lifting — protects lower-body dynamic strength.'},
+  {t:'Leave 1–3 reps in reserve on most sets',w:false,d:'Captures nearly all hypertrophy; true failure every set adds little and worsens recovery.'},
+  {t:'LEFT side / knee leads',w:false,d:'Every unilateral movement, marginally more volume/attention to the left.'},
+  {t:'No plyometric / energy-storage knee loading yet',w:true,d:'Deferred until single-leg press ~150% bodyweight is pain-free.'},
+  {t:'Collagen + vitamin C 30–60 min before tendon work',w:false,d:'15 g collagen/gelatin + ~50 mg vitamin C on leg days.'},
+  {t:'Skip / shorten the 4×4 during deload',w:true,d:'Zone 2 continues through deloads; the 4×4 does not.'},
+  {t:'Clear TRT, max-HR 4×4, and tendon progression with your clinicians',w:true,d:'Physician for TRT + maximal-HR intervals (hematocrit/BP); physiotherapist for tendon loading.'},
+  {t:'No static-stretch-only warm-up before heavy lifting',w:false,d:'Use light cardio + dynamic mobility + a movement-specific ramp instead.'}
+];
+
+// ============ PROTOCOL TABS ============
+const protoProgression = `
+<div class="sub" style="margin-bottom:12px">A 12-week block, then deload and recalibrate. This replaces the old "fixed, no progression" model.</div>
+<div class="phase-block"><span class="ph-tag hyp">WEEKS 1–3</span><h3>Accumulation</h3><p class="sci-text">2–3 RIR, base volume ~10–12 hard sets / muscle / week. Establish tendon tolerance using the 24-h pain rule (single-leg decline squat ≤3/10 next day). Start collagen + vitamin C before knee work, creatine 5 g/day, and vitamin D if untested/low.</p></div>
+<div class="phase-block"><span class="ph-tag hyp">WEEKS 4–6</span><h3>Progression</h3><p class="sci-text">Add 1–2 sets to lagging areas; tighten isolation to 1–2 RIR; progress load via double-progression (add reps, then weight).</p></div>
+<div class="phase-block"><span class="ph-tag str">WEEK 7</span><h3>Deload</h3><p class="sci-text">See the Deload tab — cut volume ~40–50%, raise RIR to 3–4.</p></div>
+<div class="phase-block"><span class="ph-tag str">WEEKS 8–10</span><h3>Intensification</h3><p class="sci-text">Heavier compounds (4–6 reps, 1–3 RIR); peak volume ~16–20 sets/week for priority muscles (TRT supports this); HSR load climbing toward 6RM.</p></div>
+<div class="phase-block"><span class="ph-tag str">WEEKS 11–12</span><h3>Peak</h3><p class="sci-text">Highest intensity, minimal added volume; the final week transitions into a deload.</p></div>
+<div class="warn-box blue"><div class="wb-title">DOUBLE-PROGRESSION RULE</div><p>Hit the top of the rep range for all sets on two consecutive sessions → add load next time and drop back to the bottom of the range. <strong>Knee exception:</strong> never add load while knee symptoms exceed the pain rule — add reps within tolerance instead.</p></div>
+<div class="warn-box teal"><div class="wb-title">KNEE / TENDON TRACK</div><p>Progress HSR from ~15RM → 6RM across the block. Advance single-leg and energy-storage/plyometric loading only when pain-monitoring criteria are met (≤3/10, 24-h rule; single-leg press ~150% BW pain-free before plyometrics).</p></div>
+`;
+
+const protoDeload = `
+<h2>Deload Strategy</h2>
+<p class="sci-text">Every 6–8 weeks, or sooner when performance and recovery markers decline.</p>
+<div class="rec-card"><div class="rec-name">Cut volume ~40–50%</div><div class="rec-how">Roughly halve the number of sets</div></div>
+<div class="rec-card"><div class="rec-name">Keep intensity moderate</div><div class="rec-how">Raise RIR to 3–4 — the loads stay respectable, you just stop short</div></div>
+<div class="rec-card"><div class="rec-name">Maintain the movement patterns</div><div class="rec-how">Same exercises, less of them</div><div class="rec-why">One low-volume week restores readiness without detraining</div></div>
+<div class="rec-card"><div class="rec-name">Cardio</div><div class="rec-how">Zone 2 continues; shorten or skip the 4×4</div></div>
+<div class="warn-box blue"><div class="wb-title">DELOAD TRIGGERS</div><ul><li>Stalled lifts + poor sleep or elevated resting HR → deload early</li><li>Knee pain not settling within 24 h → drop tendon load a tier and hold</li></ul></div>
+`;
+
+const protoRecovery = `
+<h2>Recovery Levers (in order)</h2>
+<div class="rec-card"><div class="rec-name">Sleep 7–9 h, consistent schedule ★</div><div class="rec-how">The single biggest recovery lever — no close second</div></div>
+<div class="rec-card"><div class="rec-name">Protein 1.6–2.2 g/kg/day</div><div class="rec-how">Across 3–5 feedings</div></div>
+<div class="rec-card"><div class="rec-name">One full rest day</div><div class="rec-how">Sunday — complete rest</div></div>
+<div class="rec-card"><div class="rec-name">Deload every 6–8 weeks</div><div class="rec-how">See the Deload tab</div></div>
+<div class="rec-card"><div class="rec-name">Separate cardio from lifting ≥6 h</div><div class="rec-how">Where possible</div></div>
+<div class="rec-card"><div class="rec-name">Autoregulate with RIR</div><div class="rec-how">Manage total life stress and fatigue — RIR gives you a daily dial</div></div>
+<h2>TRT-Specific Considerations</h2>
+<div class="warn-box purple"><div class="wb-title">RAISES THE CEILING, NOT THE RULES</div><p>High-normal testosterone genuinely improves recovery capacity, MPS, and tolerance to volume — so biasing priority muscles toward the upper range (~16–20 sets/week) is reasonable and likely well tolerated. It does <strong>not</strong> change the fundamentals: progressive overload, adequate protein, volume landmarks, 2×/week frequency.</p></div>
+<div class="warn-box red"><div class="wb-title">⛔ PHYSICIAN SUPERVISION IS MANDATORY</div><p>Monitor hematocrit, blood pressure, lipids, and PSA per your clinician. Heavy lifting + maximal-HR 4×4 intervals combined with TRT can elevate hematocrit and BP — get the 4×4 and heavy work cleared. Rising hematocrit or BP on labs → pause the 4×4 and consult your physician.</p></div>
+`;
+
+const protoNutrition = `
+<h2>Protein</h2>
+<div class="rec-card"><div class="rec-name">Daily target</div><div class="rec-how">1.6–2.2 g/kg body weight</div><div class="rec-why">Spread across 3–5 feedings for steady MPS</div></div>
+<h2>Around Tendon Work (leg days)</h2>
+<div class="rec-card"><div class="rec-name">Collagen / gelatin + vitamin C ★</div><div class="rec-how">15 g collagen or gelatin + ~50 mg vitamin C, 30–60 min BEFORE the session</div><div class="rec-why">Shaw 2017: roughly doubled a blood marker of collagen synthesis when taken ~1 h before loading. Strong mechanistically; does NOT build muscle strength or size.</div></div>
+<h2>Peri-Workout</h2>
+<div class="rec-card"><div class="rec-name">Post-session</div><div class="rec-how">~0.4 g/kg protein + carbs within ~1–2 h</div><div class="rec-why">MPS appears time-dependent, not sleep-state-dependent — the window is generous</div></div>
+<div class="warn-box blue"><div class="wb-title">PERSONAL — CARRIED OVER FROM YOUR HISTORY (not from the redesign)</div><ul><li><strong>IBS:</strong> spread protein across meals rather than large boluses, and keep pre-session meals ~90 min out (2 h before the 4×4), low-fat / low-spice. Titrate the daily protein target to what your gut tolerates.</li><li><strong>Heat / hydration:</strong> sip fluids rather than large single boluses; cooling foods (curd, cucumber, coconut water) around hot sessions.</li></ul><p style="margin-top:6px">Confirm any medically-relevant intake changes with your clinician.</p></div>
+`;
+
+// ============ SCIENCE TABS ============
+const sciVolume = `
+<div class="coll open"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Volume is the primary driver</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body" style="display:block">
+<p class="sci-text">Once weekly volume is equated, training a muscle <strong>2×/week</strong> is enough (Schoenfeld, Grgic & Krieger 2019). The dose-response keeps climbing with diminishing returns: a 2025 meta-regression estimated <strong>~0.24% more hypertrophy per additional weekly set</strong> around an average of ~12 sets. Aim for roughly <strong>10–20 hard sets per muscle per week</strong>.</p>
+<div class="sci-hl"><h4>Your target</h4><p>Base ~10–12 sets/muscle/week, progressing to ~16–20 for priority muscles in the intensification block. Frequency stays 2×/week per muscle.</p></div>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Proximity to failure — RIR</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>1–3 reps in reserve captures nearly all hypertrophy.</strong> Grinding to 0 RIR on every set adds little and worsens recovery and soreness (Refalo 2023; Robinson meta-regression 2024). Maximal strength is comparatively insensitive to how close you push — so heavy compounds don't need to be taken to failure.</p>
+<div class="sci-hl"><h4>Rule of thumb</h4><p>Heavy compounds: 2–3 RIR. Isolation: 1–2 RIR, occasionally to failure. Never a mandatory 0 RIR.</p></div>
+</div></div>
+`;
+
+const sciCardio = `
+<div class="coll open"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Zone 2 — why it works</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body" style="display:block">
+<p class="sci-text">Steady-state work just below the first lactate threshold (LT1) builds <strong>mitochondrial density and capillarisation</strong> — the aerobic base. It's active recovery with minimal interference to lifting, and VO2max is among the strongest predictors of all-cause mortality.</p>
+<div class="sci-hl"><h4>Your dose</h4><p>2×/week, 45–60 min, knee-friendly modality (bike, incline walk, row, elliptical). LT1 ≈ conversational, RPE 3–4/10, ~60–70% HRmax (your calibrated ~138–143 bpm). Verify progress: same HR ceiling, faster pace over ~8 weeks.</p></div>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Norwegian 4×4 — the protocol</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>4 × 4 min at 90–95% HRmax, each followed by 3 min active recovery at ~70% HRmax.</strong> Helgerud et al. 2007 established exactly this: the 4×4 raised VO2max ~7–10% and beat volume-matched moderate continuous training; Wisløff 2007 extended it safely to heart-failure patients.</p>
+<div class="sci-hl"><h4>Your dose</h4><p>1×/week (Wednesday). Work ~163–172 bpm, recovery ~120–130 bpm. Knee-friendly machine. Away from heavy leg days. Skip during deload. <strong>Clear the maximal-HR intensity with your physician (TRT + max HR → hematocrit/BP).</strong></p></div>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Concurrent training — the honest version</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text">For a hypertrophy/recreational lifter, <strong>cardio does not meaningfully blunt hypertrophy or maximal strength</strong> (Schumann/Feuerbacher 2021 — independent of modality, frequency, training status, and age). Only <strong>explosive power / rate-of-force-development</strong> is attenuated, and mostly when lifting and cardio share a session. Separating by ≥6 h reduces it further, but "eliminates" is too strong — it's already trivial for your goals. When same-session, lift first.</p>
+</div></div>
+`;
+
+const sciKnee = `
+<div class="coll open"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Heavy Slow Resistance is the core</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body" style="display:block">
+<p class="sci-text">Kongsgaard 2009: HSR (3 s/3 s tempo, heavy) <strong>matched eccentric training on pain and function at 12 weeks but produced superior collagen turnover, reduced neovascularisation, and 70% vs 22% patient satisfaction at 6 months.</strong> Recent network meta-analyses (2024–2026) find no exercise intervention statistically superior to HSR, and eccentric-only work is often the weakest for VISA-P improvement.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Isometrics — genuine but oversold</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text">The famous isometric-analgesia finding (Rio 2015) was <strong>n=6 volleyball players and has not reliably replicated</strong> (Clifford systematic review). The Spanish-squat dosing (5 × 45 s @ ~70% MVIC) is correctly drawn from that work — use isometrics as an <strong>optional pain tool, not a mandatory magic bullet</strong>.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">Treat the person, not the scan</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text">Imaging abnormalities are common and poorly predictive; symptoms improve without structural change (van Ark 2018). Load the whole kinetic chain, monitor the 24-h response (≤3/10, settled within a day), and progress on function.</p>
+</div></div>
+`;
+
+const sciFacts = `
+<div class="sub" style="margin-bottom:12px">Claims from the previous protocol, checked against the evidence. Some held up; several did not.</div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">❌ "80% of adaptation happens in deep sleep"</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Contradicted / fabricated as stated.</strong> No source assigns 80% of cardiovascular or tissue adaptation to slow-wave sleep. The real figures: NREM is ~75–80% of total nightly sleep (not repair), and <strong>~70% of daily growth-hormone output occurs during early sleep</strong> (Van Cauter 1998). MPS appears time-dependent, not sleep-state-dependent. Sleep matters enormously (7–9 h) — but that specific 80% figure should not be cited.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">❌ "TRT shortens the MPS window / mandates higher frequency"</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Unsupported.</strong> TRT increases MPS and recovery capacity and raises the tolerable-volume ceiling, but there's no evidence it "shortens the MPS window" in a way that mandates a fundamentally higher frequency than a good natural program. Volume and 2×/week frequency still govern hypertrophy. (This replaces the old "off-TRT 72-hour MPS window" reasoning entirely.)</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">⚠️ Concurrent-training interference "eliminated"</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Overstated.</strong> Real only for explosive power, mostly same-session. Hypertrophy and maximal strength are essentially uncompromised for your goals. Separation helps power, doesn't need to be framed as elimination.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">✅ Overhead triceps — the long-head figure</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Supported (corrected citation).</strong> Maeo et al., <em>Eur J Sport Sci</em> 2023 (not "Maeda/Mao"): the long head grew <strong>+28.5% overhead vs +19.6% neutral — a ~1.5× difference</strong> (whole triceps +19.9% vs +13.9%). Real effect; "1.5× more long-head growth" is more accurate than loose "40% more" framing. Small n, single study — but it reflects the broader stretch-mediated hypertrophy principle.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">✅ Gastrocnemius vs soleus (straight vs bent knee)</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Well established.</strong> The biarticular gastroc is most active with a straight knee (standing raise); a bent knee shifts load to the soleus (seated raise). Program both.</p>
+</div></div>
+<div class="coll"><div class="coll-head" onclick="tc(this)"><div class="coll-title">⚠️ Pendulum / hack "knee-friendly" claims</div><div class="coll-arrow">▼</div></div>
+<div class="coll-body">
+<p class="sci-text"><strong>Mechanistically reasonable, limited direct evidence.</strong> Both reduce axial/spinal load and balance demands and allow controlled deep flexion — defensible choices for your knees. But categorical "knee-friendly" claims are largely trainer/manufacturer framing rather than RCT-backed joint-load data.</p>
+</div></div>
+`;
+
+const sciSupps = `
+<h2>Well-Supported</h2>
+<div class="rec-card"><div class="rec-name">Collagen / gelatin 15 g + ~50 mg vitamin C ★</div><div class="rec-how">30–60 min before tendon-loading exercise</div><div class="rec-why">Shaw 2017 doubled a collagen-synthesis marker. Strong mechanistically, mixed for hard clinical outcomes, and does NOT improve muscle strength or size.</div></div>
+<div class="rec-card"><div class="rec-name">Creatine monohydrate 3–5 g/day</div><div class="rec-how">Any time, daily</div><div class="rec-why">Strongest evidence base of any supplement for strength, power, and lean mass.</div></div>
+<div class="rec-card"><div class="rec-name">Omega-3 (EPA/DHA ~2–3 g/day)</div><div class="rec-how">Daily</div><div class="rec-why">Anti-inflammatory, recovery/soreness, cardiovascular + brain health.</div></div>
+<div class="rec-card"><div class="rec-name">Vitamin D3 (~1,000–2,000 IU/day)</div><div class="rec-how">Ideally after testing levels</div><div class="rec-why">Correct deficiency for bone, muscle, immune function.</div></div>
+<h2>Speculative / Weak</h2>
+<div class="warn-box"><div class="wb-title">PROMISING BUT UNPROVEN</div><p>Glucosamine/chondroitin (modest for OA pain, not tendon), MSM, turmeric/curcumin, and proprietary "tendon" blends. Not worth building the plan around.</p></div>
+<h2>Personal — Carried From Your History</h2>
+<div class="warn-box blue"><div class="wb-title">NOT FROM THE REDESIGN — CONFIRM WITH YOUR CLINICIANS</div><ul>
+<li><strong>TRT:</strong> monitor hematocrit, BP, lipids, PSA; clear the maximal-HR 4×4.</li>
+<li><strong>IBS:</strong> spread protein, time meals ~90 min out (2 h pre-4×4), low-fat/low-spice; titrate protein to gut tolerance.</li>
+<li><strong>Sinuses:</strong> nasal breathing is the default for Zone 2 / 4×4; on congested days, nose-in / mouth-out is fine — don't force it.</li>
+<li><strong>Desk posture:</strong> the warm-ups already include t-spine and hip mobility; keep daily hip-flexor and thoracic work.</li>
+</ul></div>
+`;
+
+// ============ RENDER WEEK / HERO ============
+function renderWeek(){
+  const days2 = [
+    {n:'MON',type:'Lower A',focus:'Quad / knee focus + tendon',badge:'b-green',idx:0},
+    {n:'TUE',type:'Upper A + Zone 2',focus:'Horizontal push/pull',badge:'b-blue',idx:1},
+    {n:'WED',type:'Norwegian 4×4',focus:'VO2max — the ½ day',badge:'b-purple',idx:2},
+    {n:'THU',type:'Lower B',focus:'Hip / hamstring focus + tendon',badge:'b-green',idx:3},
+    {n:'FRI',type:'Upper B',focus:'Vertical push/pull',badge:'b-green',idx:4},
+    {n:'SAT',type:'Half Day + Zone 2',focus:'Arms / delts / calves / core',badge:'b-blue',idx:5},
+    {n:'SUN',type:'Complete Rest',focus:'Full rest + sleep',badge:'b-grey',idx:6}
+  ];
+  const weekDayName = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][todayIdx];
+  document.getElementById('heroToday').textContent = '⭐ Today — ' + weekDayName;
+  document.getElementById('heroTitle').textContent = days2[todayIdx].type;
+  document.getElementById('heroSub').textContent = days2[todayIdx].focus;
+  document.querySelector('.hero').style.cursor = 'pointer';
+  document.querySelector('.hero').onclick = () => sd(todayIdx);
+
+  const html = days2.map(d => {
+    const isToday = d.idx === todayIdx;
+    return '<div class="card day-card'+(isToday?' today':'')+'" onclick="sd('+d.idx+')">'
+      + '<div class="day-left"><div class="day-name">'+d.n+'</div>'
+      + '<span class="badge '+(isToday?'b-today':d.badge)+'" style="margin-top:4px">'+(isToday?'TODAY':d.type.split(' ')[0])+'</span></div>'
+      + '<div class="day-mid"><div class="day-type">'+d.type+'</div><div class="day-focus">'+d.focus+'</div></div>'
+      + '<div class="day-arr">›</div></div>';
+  }).join('');
+  document.getElementById('dc').innerHTML = html;
+}
+
+// ============ RENDER DAY ============
+function sd(idx){
+  const d = days[idx];
+  let html = '<h1>'+d.t+'</h1><div class="sub">'+d.focus+'</div>';
+
+  if(d.restDay){
+    html += '<div class="hero"><div class="hero-lbl">Rest Day</div><div class="hero-title">Complete Recovery</div><div class="hero-sub">No training load. Optional easy walk, sleep 7–9 h, run your weekly self-check.</div></div>';
+    html += renderRecovery(d.recovery);
+    document.getElementById('dayC').innerHTML = html;
+    ss('s-day');
+    return;
+  }
+
+  const tabList = [];
+  if(d.warmup && d.warmup.length) tabList.push({k:'wu',label:'Warmup'});
+  if(d.hasRehab) tabList.push({k:'rh',label:'Knee'});
+  if(d.mainTitle) tabList.push({k:'mn',label:d.mainTitle});
+  if(d.fourByFour) tabList.push({k:'ff',label:'4×4'});
+  if(d.zone2) tabList.push({k:'z2',label:'Zone 2'});
+  tabList.push({k:'rc',label:'Recovery'});
+
+  html += '<div class="tabs" id="dayTabs">';
+  tabList.forEach((t,i) => { html += '<div class="tab'+(i===0?' active':'')+'" onclick="dt('+i+')">'+t.label+'</div>'; });
+  html += '</div>';
+
+  tabList.forEach((t,i) => {
+    html += '<div class="tab-content'+(i===0?' active':'')+'" id="dtc'+i+'">';
+    if(t.k==='wu'){
+      html += renderWarmup(d.warmup);
+    } else if(t.k==='rh'){
+      html += kneeDay;
+    } else if(t.k==='mn'){
+      if(d.mainFocus) html += d.mainFocus;
+      html += renderExercises(d.exercises);
+    } else if(t.k==='ff'){
+      html += renderFourByFour();
+    } else if(t.k==='z2'){
+      html += renderZone2(d.zone2Machine);
+    } else if(t.k==='rc'){
+      html += renderRecovery(d.recovery);
+    }
+    html += '</div>';
+  });
+
+  document.getElementById('dayC').innerHTML = html;
+  ss('s-day');
+}
+
+function renderWarmup(wu){
+  let h = '<div class="warn-box blue"><div class="wb-title">WARM-UP — NO STATIC STRETCHING BEFORE HEAVY WORK</div><p>Light cardio → dynamic mobility → a movement-specific ramp into the first compound.</p></div><h2>Warm-Up</h2>';
+  wu.forEach(w => {
+    h += '<div class="wu-card"><div class="wu-name">'+w.name+'</div>'
+      + '<div class="wu-how">'+w.how+'</div>'
+      + '<div class="wu-why">'+w.why+'</div>'
+      + '<a class="vid-btn small" href="'+yt(w.vid)+'" target="_blank">▶ Video — '+w.name+'</a>'
+      + '</div>';
+  });
+  return h;
+}
+
+function renderExercises(exs){
+  let h = '<h2>Main Session</h2>';
+  exs.forEach((e,i) => {
+    const meta = [e.sets, (e.rir?e.rir:null), e.rest+' rest'].filter(Boolean).join(' · ');
+    h += '<div class="ex-card"><div class="ex-head" onclick="ec(this)">'
+      + '<div class="ex-num">'+String(i+1).padStart(2,'0')+'</div>'
+      + '<div class="ex-info"><div class="ex-name">'+e.name+'</div>'
+      + '<div class="ex-sets">'+meta+'</div></div>'
+      + '<div class="ex-arrow">▾</div></div>'
+      + '<div class="ex-body">'
+      + '<div class="ex-row"><span class="ex-pill">'+e.group+'</span><span class="ex-pill">'+e.target+'</span><span class="ex-pill">'+e.eq+'</span>'+(e.tempo?'<span class="ex-pill">Tempo: '+e.tempo+'</span>':'')+'</div>'
+      + '<div class="ex-reason">'+e.reason+'</div>'
+      + '<div class="dd">'
+      + '<div class="dd-col do"><h4>DO</h4>'+e.doCues.map(c=>'<div class="dd-item">'+c+'</div>').join('')+'</div>'
+      + '<div class="dd-col dont"><h4>DON\'T</h4>'+e.dontCues.map(c=>'<div class="dd-item">'+c+'</div>').join('')+'</div>'
+      + '</div>'
+      + '<a class="vid-btn" href="'+yt(e.vid+' form')+'" target="_blank">▶ Video — '+e.name+'</a>'
+      + '</div></div>';
+  });
+  return h;
+}
+
+function renderFourByFour(){
+  let h = '<div class="warn-box red"><div class="wb-title">⛔ CLEAR MAX-HR INTERVALS WITH YOUR PHYSICIAN</div><p>TRT + maximal-HR work can elevate hematocrit and blood pressure. Get this cleared, and pause it if labs rise.</p></div>';
+  h += '<div class="hr-box"><div class="hr-label">Work Interval HR</div><div class="hr-big">163–172 bpm</div><div class="hr-sub">4 × (4 min work at 90–95% HRmax / 3 min recovery at ~70% HRmax ≈ 120–130 bpm)</div></div>';
+  h += '<div class="warn-box teal"><div class="wb-title">STRUCTURE (~38 min)</div><ul><li>10 min warm-up (easy → progressive ramp)</li><li>4 × (4 min @ 163–172 bpm / 3 min active recovery @ ~70% HRmax)</li><li>5 min cool-down</li></ul></div>';
+  h += '<div class="option-card primary"><div class="option-head"><div class="option-title">🚴 Fan Bike</div><span class="option-tag">PRIMARY</span></div>'
+    + '<ul class="option-list">'
+    + '<li>Zero impact, symmetric load, no deep loaded knee flexion under fatigue</li>'
+    + '<li>Resistance: dial to hit the HR target by minute 2 of interval 1</li>'
+    + '<li>Recovery: keep spinning easy — never stop dead</li>'
+    + '</ul></div>';
+  h += '<div class="option-card"><div class="option-head"><div class="option-title">🚣 Rowing Ergometer</div><span class="option-tag alt">ALTERNATE</span></div>'
+    + '<ul class="option-list">'
+    + '<li>Damper 3–5 for work (never above 5 — knee safety at the catch)</li>'
+    + '<li>Shins vertical at the catch, never over-compressed</li>'
+    + '<li><strong>Any knee sensation at the catch → switch to the fan bike mid-session</strong></li>'
+    + '</ul></div>';
+  h += '<div class="warn-box"><div class="wb-title">COMMON RULES</div><ul>'
+    + '<li>Away from heavy leg days (this is the mid-week ½ day)</li>'
+    + '<li>Skip or shorten during deload weeks</li>'
+    + '<li>Log: date, machine, avg HR per interval, RPE</li>'
+    + '</ul></div>';
+  return h;
+}
+
+function renderZone2(machine){
+  const isBike = machine === 'bike';
+  const setting = isBike ? 'Stationary bike — resistance to hold the HR target' : 'Incline treadmill walk — knee-friendly, adjust speed/incline to the HR target';
+  let h = '<div class="hr-box"><div class="hr-label">Target Heart Rate</div><div class="hr-big">138–143 bpm</div><div class="hr-sub">LT1 — conversational, RPE 3–4/10, ~60–70% HRmax</div></div>';
+  h += '<div class="warn-box teal"><div class="wb-title">SETUP</div><p>'+setting+'. Knee-friendly modality (bike, incline walk, row, elliptical). Talk test: full sentences with slight effort.</p></div>';
+  h += '<div class="warn-box blue"><div class="wb-title">DOSE</div><p>45–60 min, 2×/week. Keep it <strong>≥6 h from the day\'s lift</strong> where possible; if it must be the same block, do it AFTER lifting.</p></div>';
+  h += '<div class="rec-card"><div class="rec-name">Progress check</div><div class="rec-how">Same HR ceiling, faster pace over ~8 weeks</div><div class="rec-why">Confirms an improving aerobic threshold</div></div>';
+  return h;
+}
+
+function renderRecovery(rec){
+  let h = '<h2>Recovery</h2>';
+  rec.forEach(r => {
+    h += '<div class="rec-card"><div class="rec-name">'+r.name+'</div><div class="rec-how">'+r.how+'</div>'
+      + (r.why ? '<div class="rec-why">'+r.why+'</div>' : '')
+      + '</div>';
+  });
+  return h;
+}
+
+// ============ NAV & UI ============
+function ss(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navMap = {'s-home':0,'s-knee':2,'s-proto':3,'s-science':4};
+  if(id in navMap) document.querySelectorAll('.nav-btn')[navMap[id]].classList.add('active');
+  window.scrollTo(0,0);
+}
+function openToday(){
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  sd(todayIdx);
+}
+function ec(el){ el.parentElement.classList.toggle('open'); }
+function pt(i){
+  document.querySelectorAll('#s-proto .tabs .tab').forEach((t,idx) => t.classList.toggle('active', idx===i));
+  document.querySelectorAll('#s-proto .tab-content').forEach((t,idx) => t.classList.toggle('active', idx===i));
+}
+function st(i){
+  document.querySelectorAll('#s-science .tabs .tab').forEach((t,idx) => t.classList.toggle('active', idx===i));
+  document.querySelectorAll('#s-science .tab-content').forEach((t,idx) => t.classList.toggle('active', idx===i));
+}
+function dt(i){
+  document.querySelectorAll('#dayTabs .tab').forEach((t,idx) => t.classList.toggle('active', idx===i));
+  document.querySelectorAll('#s-day .tab-content').forEach((t,idx) => t.classList.toggle('active', idx===i));
+  window.scrollTo(0,0);
+}
+function tc(el){ el.parentElement.classList.toggle('open'); }
+
+// ============ INIT ============
+document.getElementById('pt0').innerHTML = protoProgression;
+document.getElementById('pt1').innerHTML = protoDeload;
+document.getElementById('pt2').innerHTML = protoRecovery;
+document.getElementById('pt3').innerHTML = protoNutrition;
+
+document.getElementById('sct0').innerHTML = sciVolume;
+document.getElementById('sct1').innerHTML = sciCardio;
+document.getElementById('sct2').innerHTML = sciKnee;
+document.getElementById('sct3').innerHTML = sciFacts;
+document.getElementById('sct4').innerHTML = sciSupps;
+
+document.getElementById('kneeC').innerHTML = kneeSystem
+  + '<div class="warn-box red"><div class="wb-title">RULES SNAPSHOT</div></div>'
+  + rules.map(r => '<div class="rule-item"><div class="rule-title'+(r.w?' warn':'')+'">'+r.t+'</div><div class="rule-body">'+r.d+'</div></div>').join('');
+
+renderWeek();
+</script>
+</body>
+</html>
