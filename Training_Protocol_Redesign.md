@@ -1,52 +1,68 @@
-# Training Protocol v2 — Full Separation Build
+# Training Protocol — Final Plan
 ### 39M on physician-supervised TRT · maximum strength + hypertrophy · bilateral knee tendon rehab · longevity conditioning
-**Every training day is EITHER resistance OR conditioning. Never both.**
+**Six slots, run in sequence. Every slot is EITHER resistance OR conditioning — never both. Rest whenever you need to.**
 
 *Built August 2026. Every citation below was verified against the primary source. Where the source says something different from what it is popularly claimed to say, that is flagged explicitly.*
 
 ---
 
-## TL;DR
+## ⚠ Read first — the neurological situation
 
-- **The split:** 4 lifting days (Upper A / Lower A / Upper B / Lower B) + 1 dedicated Zone 2 + 1 flexible day (Norwegian 4×4 by default, Zone 2 if beaten up) + 1 full rest day. The old "half day" is gone — its arms/delts/calves/forearms/neck/core content is redistributed into the four lifting days, and every muscle still gets ≥2 sessions per week.
-- **I moved your proposed layout by one slot.** Recommended: **Lower A Mon → Upper A Tue → Zone 2 Wed → Lower B Thu → Upper B Fri → 4×4 (or Z2) Sat → Rest Sun.** Two reasons: it puts your heaviest tendon-loading session immediately after the full rest day (best tendon readiness), and it opens the gap between your last heavy lower day and the maximal-HR intervals from ~24 h to ~48 h. Your original ordering still works — this is a strict improvement, not a correction.
-- **The separation is better justified than your brief claims.** The brief says full separation makes interference "moot." It is stronger than that: the one interference effect that survives modern meta-analysis is **lower-body maximal strength in males** (SMD −0.43, 95% CI −0.64 to −0.22; Huiberts 2024) and same-session pairing is where it concentrates (−0.66 same-session vs −0.10 separated; Petré 2021). You are a trained male whose priority outcome is lower-body strength. Full separation is not a nicety here — it is the single highest-leverage structural decision in this program.
-- **Zone 2 evidence has genuinely shifted** (Storoschuk 2025, *Sports Med*): current evidence does **not** support Zone 2 as the optimal intensity for mitochondrial or fatty-acid oxidative capacity. Zone 2 keeps its slot in this program on **recovery-cost** grounds — cheap aerobic volume that doesn't tax a healing tendon — not on mitochondrial grounds. That reframing is what makes the 4×4 the *default* for the flexible day rather than the optional extra.
-- **Three claims in your brief did not survive verification.** (1) The Lundy 2026 paper does not report a 3.7% mortality reduction — it *borrows* that figure as a modelling input for a cross-sectional survey of 340 marathoners with watch-estimated VO₂max. (2) "Eccentric-only is frequently weakest" is true of Li 2024 but **not** of Liu 2026, where eccentric *overload* had the most favourable point estimate vs HSR. (3) "TRT raises the tolerable-volume ceiling" is mechanistically plausible but has never been directly tested. Details in the fact-check table.
-- **Medical clearances needed before Week 1:** hematocrit + BP + lipids + PSA baseline with your prescriber; explicit clearance for maximal-HR intervals; and a **confirmed knee diagnosis** from a physiotherapist or sports physician. This protocol is built for patellar tendinopathy. If it is patellofemoral pain, quadriceps tendinopathy, fat-pad impingement or early OA, parts of the lower-body prescription change. See §8.1.
+You have now had **two separate neurological episodes**: four months of numbness on the right leg that resolved on its own, and an acute simultaneous right perioral and right little-finger event during heavy training.
+
+The C8-and-trigeminal explanation is anatomically coherent for the second event. **It does not account for the first.** Mechanical compression from lifting resolves in hours to days, as your finger did — it does not usually produce four months of numbness and then clear. Two events separated in time and body region is the pattern that triggers a neurological workup rather than form coaching.
+
+**On TRT this matters more, not less.** Testosterone therapy raises haematocrit; raised haematocrit raises blood viscosity and thrombotic risk. Acute one-sided facial numbness in a man on TRT who lifts heavily is a scenario where stroke and TIA need excluding.
+
+**Ask your doctor for:** haematocrit and haemoglobin, blood pressure, and a neurological examination. Mention the four-month leg episode explicitly — that is the detail that changes what they look for.
+
+**Emergency signs — stop and seek care immediately:** numbness spreading to face, tongue or arm; facial drooping; slurred speech or trouble swallowing; sudden weakness in an arm or leg; loss of balance; sudden severe headache; any change in vision.
+
+### What changed in this plan because of it
+
+| | Change |
+|---|---|
+| **Removed** | All neck training. It was optional anyway and loads exactly the implicated tissue. |
+| **Removed** | Any behind-the-neck movement. None remain. |
+| **Changed** | Overhead press is now **seated with a back pad** — a standing press loads the neck stabilisers and invites breath-holding. |
+| **Changed** | Shrugs lightened to 2 × 12–15 at moderate load, no straps. |
+| **Added** | Cervical mobility and a breathing/bracing drill to every warm-up. |
+| **Added** | A neck decompression step to every cool-down. |
+| **Gated** | The 4×4 needs medical clearance. Zone 2 fills the slot meanwhile — that substitution is always valid. |
+| **Rule** | **Exhale on effort. Never hold your breath under load.** Every set, every session. |
+
+A hard Valsalva raises intrathoracic pressure, which raises venous pressure in the head and neck. Combined with a strained neck position and tight scalenes, that is the most plausible mechanical route to irritating both the C8 root and the descending trigeminal tract at the same instant. You still need to brace — you need to brace **while exhaling** rather than against a closed throat.
 
 ---
 
-## 1. The week
+## TL;DR
 
-**Recommended layout**
+- **Six slots, run in order:** `01 Lower A → 02 Upper A → 03 Zone 2 → 04 Lower B → 05 Upper B → 06 VO₂max (or Zone 2)` → back to 01.
+- **No weekdays, no week numbers, no phases.** Finish a slot, rest as long as you want, start the next. Because rest only ever pushes the cycle further apart, spacing between same-muscle sessions only ever gets longer — you cannot break the recovery rules by resting. Aim to close a cycle in **6–8 days**; beyond that, every muscle drops below twice weekly and the volume figures here stop being true.
+- **Load moves on conditions, not on a calendar.** Add weight only when every condition in §5 is met. The HSR tendon track still runs 15RM → 6RM, but it gets there when the 24-hour rule keeps clearing, not by a fixed schedule.
+- **The 4×4 is included, and substituting Zone 2 is always a valid choice** — not a compromise. Under the updated Zone 2 evidence, Zone 2 earns its place on recovery-cost grounds rather than mitochondrial ones, which is exactly why it makes a good substitute when you are beaten up or uncleared.
+- **Clearances needed:** haematocrit, BP, lipids and PSA with your prescriber; explicit clearance for maximal-HR intervals; a neurological assessment for the symptoms above; and a confirmed knee diagnosis from a physiotherapist. This plan assumes patellar tendinopathy — see §8.1.
 
-| Day | Session | Type | Why here |
+---
+
+## 1. The cycle
+
+| Slot | Session | Type | Purpose |
 |---|---|---|---|
-| **Mon** | **Lower A** — quad/knee focus, HSR tendon load | Resistance | Heaviest tendon-loading day lands on the freshest possible tissue, straight off the full rest day |
-| **Tue** | **Upper A** — horizontal push/pull | Resistance | Legs offloaded the day after heavy knee work; no aerobic stress anywhere near it |
-| **Wed** | **Zone 2** — 45–60 min, standalone | Conditioning | Mid-week aerobic block with the lowest possible recovery cost; doubles as active recovery between lower days |
-| **Thu** | **Lower B** — hip/hamstring focus, 2nd tendon dose | Resistance | 72 h after Lower A — full recovery of the knee extensor mechanism |
-| **Fri** | **Upper B** — vertical push/pull | Resistance | 72 h after Upper A; legs rest ahead of Saturday's intervals |
-| **Sat** | **Norwegian 4×4** (default) *or* **Zone 2** (if fatigued) | Conditioning | ~48 h clear of the last heavy lower session — double the ≥24 h minimum |
-| **Sun** | **Full rest** | — | One genuine off day, positioned to precede the heaviest tendon session |
+| **01** | **Lower A** | Resistance | Quad/knee focus, primary HSR tendon load |
+| **02** | **Upper A** | Resistance | Horizontal push/pull, arms, forearms |
+| **03** | **Zone 2** | Conditioning | Standalone aerobic, lowest recovery cost |
+| **04** | **Lower B** | Resistance | Hip/hamstring focus, second tendon dose |
+| **05** | **Upper B** | Resistance | Vertical push/pull, arms, forearms |
+| **06** | **VO₂max 4×4** *(or Zone 2)* | Conditioning | Intervals — substitute Zone 2 freely |
 
-**Your original layout, for comparison**
+Then back to 01.
 
-| | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
-|---|---|---|---|---|---|---|---|
-| **Yours** | Upper A | Lower A | Zone 2 | Upper B | Lower B | Z2 / 4×4 | Rest |
-| **Recommended** | Lower A | Upper A | Zone 2 | Lower B | Upper B | Z2 / 4×4 | Rest |
+**Why this order.** If you run the slots on consecutive days you get 72 h between Lower A and Lower B and between Upper A and Upper B; Zone 2 falls between the two lower slots as active recovery; and the intervals land two slots after the last heavy lower day. Insert rest days anywhere and every one of those gaps only gets longer. The order is self-correcting — the sequence protects spacing without you having to think about the calendar.
 
-Both satisfy every hard constraint. The swap buys two things: **tendon-first freshness** (a symptomatic tendon performs and tolerates load best after a rest day, and the whole 12-week block is gated on tendon tolerance) and **48 h instead of 24 h** between heavy lower-body work and maximal-HR intervals. Nothing else changes.
+**What it does not protect is rate.** Six slots across 6–8 days keeps every muscle at roughly twice weekly, which is what the volume table in §3 assumes. Stretch a cycle to 12 days and you are training everything about 1.2×/week, and the numbers stop being true.
 
-**What the layout achieves**
-
-- **Zero same-session concurrent training.** Lifting and cardio never share a day, so the ≥6 h separation rule is satisfied automatically and permanently.
-- **48–72 h between same-muscle-group sessions.** Lower A → Lower B = 72 h. Upper A → Upper B = 72 h.
-- **Maximal-HR work ≥48 h from heavy legs**, and immediately before the rest day.
-- **One full rest day**, positioned where it does the most good.
-- **Every muscle group trained 2×/week** — verified by set count in §3.
+**Never combine lifting and conditioning on one day.** Interference is small in the pooled data, but it concentrates in exactly your profile — lower-body maximal strength in trained males (SMD −0.43, Huiberts 2024) and mostly same-session (−0.66 same-session vs −0.10 separated, Petré 2021). Separation removes the condition where the effect appears, permanently and structurally.
 
 ---
 
@@ -198,7 +214,7 @@ The old standalone Saturday session (arms / delts / calves / neck / forearms / c
 | Wrist curl / reverse wrist curl | Upper A (2+2) **and** Upper B (2+2) | 3 → 8 weekly sets, 2×/week |
 | Standing + seated calf raise | Lower A (4 standing + 2 seated) **and** Lower B (4 seated + 2 standing) | 6 → 12 weekly sets, **both** heads 2×/week |
 | Weighted carries | Upper A finisher (3) | Unchanged, doubles as core/grip |
-| Neck flexion/extension *(optional)* | Upper B (2) | Only if contact-sport or athletic goals apply |
+| Neck flexion/extension *(optional)* | **Removed** | Dropped entirely — cervical precaution, see top of document |
 | Core circuit 10–15 min | Lower A (hanging leg raise 3) + Lower B (Pallof 3) + carries | Replaced by 3 targeted movements — less junk volume, same coverage |
 | Rear delt work | Upper A (face pull 3) + Upper B (reverse flye 3) | Now explicitly 2×/week |
 
@@ -220,18 +236,17 @@ Direct sets counted as 1, indirect as 0.5 (fractional method, per Pelland 2026).
 | Rear delts | 2 | 6 | **9.5** | Support ✓ |
 | Core / anti-rotation | 3 | 6 | **7.5** | Support ✓ |
 | Front delts | 2 | 4 | **7.5** | Support ✓ |
-| Traps | 3 | 3 | **6** | Maintenance ✓ |
+| Traps | 3 | 2 | **5** | Maintenance ✓ |
 | Gastrocnemius | 2 | 6 | **6** | Maintenance ✓ |
 | Soleus | 2 | 6 | **6** | Maintenance ✓ |
 | Hip abductors | 2 | 6 | **6** | Rehab ✓ |
 | Tibialis anterior | 2 | 5 | **5** | Rehab ✓ |
 | Adductors | 2 | 5 | **5** | Rehab ✓ |
 | Rotator cuff | 2 | 5 | **5** | Health ✓ |
-| Neck *(optional)* | 1 | 2 | **2** | Optional ✓ |
 
-**Every muscle ≥2×/week (neck excepted — it is optional). Nothing lost. No fifth lifting day.**
+**Every muscle trained twice per cycle. Neck training has been removed entirely for the cervical precaution described at the top of this document.**
 
-These figures are computed, not estimated: the companion HTML calculates them live from the same session data, so the two documents cannot drift apart. Bands follow your brief — priority 16–20, support 10–14 — with a maintenance/rehab tier for calves, traps, cuff, tibialis, adductors and abductors, where 5–6 quality sets twice weekly is the appropriate dose rather than a shortfall.
+These figures are computed, not estimated: the companion HTML calculates them live from the same session data, so the two documents cannot drift apart. They assume one full cycle per 6–8 days. Bands follow your brief — priority 16–20, support 10–14 — with a maintenance/rehab tier for calves, traps, cuff, tibialis, adductors and abductors, where 5–6 quality sets twice weekly is the appropriate dose rather than a shortfall.
 
 Ceiling check: no muscle exceeds 9 direct sets in any single session, staying under the ~11 fractional per-session soft ceiling from Remmert 2025.
 
@@ -315,19 +330,18 @@ If you want to shift priority — say chest to 16 — add 3 sets to incline pres
 
 | # | Exercise | Sets × reps | RIR | Rest | Tempo | Purpose |
 |---|---|---|---|---|---|---|
-| 1 | Overhead press (seated or standing) | 4 × 5–8 | 2–3 | 3 min | 2/1/1 | Primary vertical press, strength emphasis. |
+| 1 | **Seated supported overhead press** | 4 × 6–8 | 2–3 | 3 min | 2/1/1 | Primary vertical press. **Changed from standing** — back pad, exhale on the press. Cervical precaution. |
 | 2 | Weighted pull-up *or* pulldown (neutral grip) | 4 × 6–10 | 1–2 | 2–3 min | 2/1/2 | Vertical pull, loaded. |
 | 3 | Dip *or* decline press | 3 × 8–12 | 1–2 | 2 min | 2/1/2 | Lower chest + triceps under a different joint angle. |
 | 4 | Cable row (different handle/angle to Upper A) | 4 × 10–12 | 1–2 | 2 min | 2/1/2 | Mid-back; avoids duplicating the chest-supported row stimulus. |
 | 5 | **Cable lateral raise (leaning)** | 4 × 12–20 | 0–1 | 90 s | 2/1/2 | Side delts. +1 set from the old half day. |
-| 6 | Shrug | 3 × 10–15 | 1–2 | 90 s | 2/1/2 | Upper traps. |
+| 6 | **Shrug — moderate load** | 2 × 12–15 | 2–3 | 90 s | 2/1/2 | Upper traps, **deliberately lightened**. No straps, no breath-holding. Cervical precaution. |
 | 7 | Reverse pec deck / rear-delt flye | 3 × 15–20 | 0–1 | 60 s | 2/1/2 | Rear delts — second weekly dose. |
 | 8 | Preacher or cable curl | 3 × 10–12 | 1 | 90 s | 2/1/2 | Biceps at short-to-mid length — complements Upper A's incline curl. |
 | 9 | Hammer curl | 2 × 10–12 | 1 | 60 s | 2/1/2 | Brachialis / brachioradialis. |
 | 10 | Rope pushdown *or* skullcrusher | 3 × 10–15 | 1 | 90 s | 2/1/2 | Triceps lateral/medial heads. |
 | 11 | External rotation (cable or band) | 2 × 15 | 2 | 45 s | 2/1/2 | Rotator cuff. |
 | 12 | Wrist curl + reverse wrist curl | 2 × 15–20 each | 1 | 45 s | 2/1/2 | Forearms, second dose. |
-| 13 | Neck flexion / extension *(optional)* | 2 × 15 | 2 | 60 s | slow | **Only if contact-sport or athletic goals apply.** Otherwise omit. |
 
 ---
 
@@ -373,58 +387,90 @@ Sequence: warm-up → 4 min hard → 3 min easy → 4 min hard → 3 min easy �
 
 ---
 
-## 5. Twelve-week progression
+## 5. How hard, and when to move
 
-Two tracks run in parallel: the **strength/hypertrophy track** and the **tendon track**. They share sessions but progress on different logic — the tendon track progresses by *load and rep-range* on a fixed schedule gated by symptoms, while the strength track progresses by double progression gated by performance.
+There are no week numbers in this plan. Load moves when conditions are met.
 
-| Weeks | Phase | Strength / hypertrophy track | Tendon (HSR) track | RIR |
-|---|---|---|---|---|
-| **1–3** | **Accumulation** | Base volume as written. Establish loads. Learn the 3s/3s tempo before chasing weight on it. | **~15RM** loads on hack squat + leg extension. Establish 24-hour tolerance before adding anything. | 2–3 |
-| **4–6** | **Progression** | Add 1–2 sets to priority muscles (quads, back, biceps). Tighten isolation to 1 RIR. Double progression on all compounds. | **~12RM → ~10RM.** Progress only if the 24-h rule held for the previous two sessions. | 1–3 |
-| **7** | **Deload** | See §6 | Hold load, cut to 2 sets per movement, keep the tempo | 3–4 |
-| **8–10** | **Intensification** | Compounds to 4–6 reps at 1–3 RIR. Peak volume — priority muscles at the top of their band. | **~8RM.** This is where load feels genuinely heavy at 3s/3s. | 1–2 |
-| **11–12** | **Peak** | Highest intensity, volume held or slightly reduced. Week 12 tapers into the next deload. | **~6RM.** Endpoint of the Kongsgaard progression. | 1–2 |
+### Add load only when ALL of these are true
 
-**Tendon-track rule that overrides everything above:** you advance a tier only when the previous tier has been tolerated for **two consecutive sessions** under the 24-hour pain rule (§8.3). If it hasn't, you repeat the tier. A tendon that takes 16 weeks to reach 6RM has still succeeded. A tendon rushed to 6RM in 8 weeks and flared has not.
+- You hit the top of the rep range on **every** set at the target RIR
+- The tempo held on the last rep of the last set
+- The knee settled within 24 hours after the previous lower slot
+- No tingling, numbness or facial symptoms in the last two sessions
+- You slept 7 hours or more
 
-**Plyometric / energy-storage gate.** No jumping, bounding, depth work or reactive loading enters this program until:
-1. **Single-leg press ≈150% bodyweight, pain-free**, on *both* legs, and
-2. Single-leg decline squat pain ≤2/10, and
-3. Four consecutive weeks with no 24-hour flare.
+Then: add the smallest available increment and drop back to the bottom of the rep range. That is double progression, and it is the whole progression model for everything except the tendon track.
 
-All three, not any one. When all three are met, introduce plyometrics as a *fourth* category on Lower A — low volume, high quality, early in the session — and note that this is the one context where the concurrent-training interference effect genuinely applies (Schumann 2022: explosive strength SMD −0.28). At that point, keep the 4×4 at least 48 h from plyometric work.
+### Back off when ANY of these are true
 
-**After Week 12:** repeat the cycle with new exercise variations in the same movement patterns, restarting the HSR track at ~12RM with the higher absolute loads you have earned. Retest the single-leg press and the aerobic threshold in Week 13.
+| Signal | Action |
+|---|---|
+| Knee pain >3/10, or not settled within 24 h | Drop the tendon load one tier |
+| Any neurological symptom during or after the last session | Reduce load ~20%, remove overhead work entirely |
+| Sleep under 6 h, or two poor nights running | Same loads, fewer sets |
+| Resting HR up ≥7 bpm | Run Zone 2 instead of the 4×4 |
+| Stalled at the same load twice running | Lighter cycle — see §6 |
+| Joint or tendon soreness climbing across cycles | Lighter cycle. This is the main reason you would take one |
+| Haematocrit or BP trending up | Pause the 4×4, contact your prescriber |
 
----
+### The tendon track
 
-## 6. Deload
+Start the hack squat and leg extension at a load you can control for **about 15 reps at 3s/3s**. Over the months that drifts toward **6 reps** — but only when the 24-hour rule has cleared for **two consecutive sessions** at the current tier. If it hasn't, repeat the tier.
 
-**Frequency:** every 6–8 weeks, or triggered early by the thresholds in §13. Week 7 is scheduled.
+A tendon that takes six months to reach 6RM has still succeeded. One rushed there in eight weeks and flared has not. Rushing this is the single mistake that costs you the whole block.
 
-**Prescription**
-- **Volume: cut ~40–50%** — roughly halve the sets
-- **Effort: RIR 3–4** across the board
-- **Load:** keep it, or drop 10%. Do not go light and high-rep — that is a different stimulus, not a deload
-- **Frequency: unchanged** — same four lifting days, same movement patterns
-- **Zone 2: continues as normal.** It is already low-cost
-- **4×4: skipped.** Replace with Zone 2
+### The plyometric gate
 
-**Honest note on the evidence.** Deloading is near-universal practice with surprisingly thin direct support. A survey of 246 competitive strength and physique athletes found deloads taken every **5.6 ± 2.3 weeks** lasting **6.4 ± 1.7 days**, with volume reduced, frequency maintained and effort reduced via increased RIR (Rogerson et al., *Sports Med Open* 2024;10:26. doi:10.1186/s40798-024-00691-y) — which is exactly the prescription above, and it is derived from practice, not from outcome trials. Meanwhile Coleman et al. (*PeerJ* 2024;12:e16777) tested a one-week deload mid-programme and found **no enhancement of muscle growth**; participants reported feeling lethargic rather than refreshed, though that deload involved complete cessation rather than reduced load.
-
-**So why deload at all in your case?** Not for hypertrophy — for the **tendon and the joints**. Connective tissue adapts on a slower timescale than muscle, and a symptomatic patellar tendon accumulating twice-weekly heavy slow loading for six straight weeks is the thing most likely to force an unplanned break. The deload here is tendon insurance, and it is honest to call it that rather than dressing it up as a hypertrophy strategy.
+No jumping, bounding or reactive loading until **all three** are true: single-leg press ≈150% bodyweight pain-free on both legs; single-leg decline squat ≤2/10; four consecutive clear weeks with no 24-hour flare. Given the current neurological picture, clear it with your doctor before adding it even then.
 
 ---
 
-## 7. Warm-up
+## 6. Lighter cycles — triggered, not scheduled
 
-Same sequence every lifting day. Roughly 10–12 minutes.
+**When:** any trigger in the back-off table above, or joint/tendon soreness climbing across cycles.
 
-1. **5 min Zone 1–2 cardio** — bike or rower. Raise core temperature. This is not the Zone 2 session; it is a warm-up and does not count toward aerobic volume.
-2. **~5 min dynamic mobility** — hips (90/90, hip airplanes), **ankles (weighted dorsiflexion — directly relevant to knee tracking)**, t-spine rotation, shoulder circles and band dislocates.
-3. **Movement-specific ramp** — 2–3 progressively heavier sets of the first compound, ending ~1 set below working weight.
-4. **On lower days:** the Spanish squat isometric can double as the final warm-up step *and* the potentiator. If it leaves your quads fatigued rather than primed, move it to the end of the session or drop it.
-5. **No static-stretch-only warm-up before heavy lifting.**
+**What it looks like**
+- **Volume cut ~40–50%** — roughly halve the sets
+- **Effort at RIR 3–4**
+- **Load and movement patterns kept** — do not go light and high-rep, that is a different stimulus
+- **Zone 2 continues** as normal
+- **4×4 skipped**, replaced with Zone 2
+
+**Honest note.** Deloading is near-universal practice with thin direct support. A survey of 246 competitive athletes found deloads roughly every 5.6 ± 2.3 weeks with volume cut and RIR raised — exactly this prescription, derived from practice rather than trials (Rogerson et al., *Sports Med Open* 2024;10:26). Coleman et al. (*PeerJ* 2024;12:e16777) tested a one-week deload and found **no** hypertrophy benefit.
+
+**So why take them?** For the **tendon and joints**, not for muscle. Connective tissue adapts slower than muscle, and a symptomatic patellar tendon under twice-per-cycle heavy slow loading is the thing most likely to force an unplanned break. This is tendon insurance, and it is honest to call it that.
+
+---
+
+## 7. Warm-up and cool-down
+
+### Warm-up — every lifting slot, ~15 min
+
+| # | Step | Time |
+|---|---|---|
+| 1 | **General warm-up** — 5 min easy bike or rower, enough for a light sweat. Not aerobic training; does not count toward Zone 2 volume. | 5 min |
+| 2 | **Breathing and bracing drill** — six slow breaths supine, hand on belly. Then brace the trunk hard **while exhaling**. The most important addition to this plan: trunk stiffness without breath-holding. | 2 min |
+| 3 | **Cervical mobility and release** — 10 slow chin nods, 10 gentle rotations each way, 30 s each side upper trap and scalene stretch. Gentle; no cranking, no end-range holds. | 3 min |
+| 4 | **Dynamic mobility** — hips (90/90, hip airplanes), **ankles (weighted dorsiflexion)**, t-spine rotation, band shoulder dislocates. | 4 min |
+| 5 | **(Lower slots only)** Spanish squat isometric, 5 × 45 s — optional, doubles as warm-up and pain modulation. Move it to the end or drop it if it tires the quads. | 6 min |
+| 6 | **Movement-specific ramp** — 2–3 progressively heavier sets of the first compound, ending one set below working weight. | 3–5 min |
+
+**No static-stretch-only warm-up before heavy lifting.**
+
+### Warm-up — conditioning slots
+
+- **Zone 2:** the first 5 minutes are the warm-up — start below range and drift up. Plus 2 min cervical mobility.
+- **4×4:** a full 10 minutes, building gradually, finishing the last two minutes near recovery pace. Plus 2 min cervical mobility, and two 30-second surges near interval pace in the last three minutes. Do not shortcut this — going into interval one cold is how you fail interval four.
+
+### Cool-down — every lifting slot
+
+| # | Step | Time |
+|---|---|---|
+| 1 | Easy spin or walk — brings HR down, prevents post-session light-headedness after heavy sets. | 3–5 min |
+| 2 | **Neck decompression** — supine gentle chin tuck 30 s, then doorway pec stretch 30 s each side. Tight pecs pull the shoulders forward and load the neck. | 2 min |
+| 3 | Nothing else is required. No long static stretching, no foam-rolling ritual — neither changes your outcomes here. | — |
+
+**Conditioning slots:** 5 min easy, do not stop dead. Stand up slowly — relevant on TRT with raised haematocrit.
 
 ---
 
@@ -600,6 +646,8 @@ Every key claim from the original protocol and from your redesign brief, re-veri
 
 | Signal | Action |
 |---|---|
+| **Any neurological symptom during a session** | Rack the weight, end the session. Note the load and whether you were breath-holding. Tell your doctor regardless. Next session: −20% load, no overhead work. |
+| **Emergency signs** (spreading numbness, facial droop, slurred speech, weakness, balance loss, sudden severe headache, vision change) | **Stop and seek emergency care immediately.** |
 | **Knee pain >3/10 during loading, or not settled within 24 h** | Drop tendon load one tier at the next session. Hold progression. |
 | **Two consecutive 24-h flares** | Hold the tier for two weeks; get physiotherapist review. |
 | **Knee pain at rest >3/10** | Swap Saturday's 4×4 for Zone 2. Reassess Lower A. |
@@ -618,10 +666,11 @@ Every key claim from the original protocol and from your redesign brief, re-veri
 - **TRT management, hematocrit/BP/lipid/PSA monitoring, and clearance for maximal-HR intervals are medical decisions for your prescribing physician.** Nothing here substitutes for that.
 - **Tendinopathy loading should be overseen by a physiotherapist**, and the diagnosis confirmed before Week 1 (§8.1). This programme assumes you can already squat, split-squat, lunge and leg-press with tolerable symptoms.
 - **Isometric analgesia and "knee-friendly machine" claims rest on weaker evidence than the core progressive-loading principle.** Individualise both based on your own 24-hour symptom response.
-- **Neck training is optional** and included only if contact-sport or athletic goals apply.
+- **Neck training has been removed entirely** given the cervical symptoms, and should not be reintroduced without medical clearance.
 - **The per-session volume ceiling (~11 fractional sets) comes from a preprint.** Treat it as a reasonable heuristic, not settled science.
 - **Where the original protocol was well-founded** — twice-weekly frequency, stretch-position exercise selection, removal of activation and pre-exhaust drills, gastroc/soleus differentiation, Spanish-squat dosing, HSR as the tendon core, collagen + vitamin C timing — **it has been preserved.** Only the overstated claims were corrected, and every correction is documented in §12.
-- **Removed and not carried over:** the standalone half day; pre-exhaustion and activation supersets; redundant overlapping isolation angles; early ballistic knee loading; any "TRT justifies daily muscle hits" scheme; and the fabricated sleep-adaptation percentage.
+- **The 4×4 requires medical clearance** before first use, and Zone 2 is always a valid substitute in slot 06.
+- **Removed and not carried over:** the standalone half day; all neck training; standing overhead pressing; heavy shrugs; pre-exhaustion and activation supersets; redundant overlapping isolation angles; early ballistic knee loading; any "TRT justifies daily muscle hits" scheme; and the fabricated sleep-adaptation percentage.
 
 ---
 

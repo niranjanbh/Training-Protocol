@@ -4,702 +4,410 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0e1116">
-<title>Protocol v2 — Full Separation</title>
+<title>Protocol — Final Plan</title>
 <style>
-/* ============================================================
-   DESIGN TOKENS
-   Palette: iron + chalk. Four accents, each carrying meaning:
-     load   = resistance work
-     aero   = conditioning work
-     tendon = HSR / knee track
-     halt   = stop rules
-   Type thesis: prescriptions are monospaced data; reasoning is prose.
-   ============================================================ */
 :root{
-  --ink:#0e1116;
-  --slab:#171c24;
-  --slab-hi:#1f2630;
-  --line:#2a323f;
-  --line-soft:#212936;
-  --bone:#e9e7e2;
-  --ash:#8a94a4;
-  --ash-dim:#5f6878;
-
-  --load:#f0a43a;
-  --load-bg:#2b1f0c;
-  --aero:#48b6cf;
-  --aero-bg:#0c242b;
-  --tendon:#a98bd6;
-  --tendon-bg:#1e1630;
-  --halt:#e0645f;
-  --halt-bg:#2b1414;
+  --ink:#0e1116; --slab:#171c24; --slab-hi:#1f2630; --line:#2a323f; --line-soft:#212936;
+  --bone:#e9e7e2; --ash:#8a94a4; --ash-dim:#5f6878;
+  --load:#f0a43a; --load-bg:#2b1f0c;
+  --aero:#48b6cf; --aero-bg:#0c242b;
+  --tendon:#a98bd6; --tendon-bg:#1e1630;
+  --halt:#e0645f; --halt-bg:#2b1414;
   --ok:#5cc08e;
-
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-
-  --r:10px;
-  --pad:16px;
+  --r:10px; --pad:16px;
 }
-
 *{margin:0;padding:0;box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{
-  background:var(--ink);
-  color:var(--bone);
-  font-family:var(--sans);
-  font-size:15px;
-  line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-  padding-bottom:calc(74px + env(safe-area-inset-bottom));
-  overflow-x:hidden;
-}
+body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;padding-bottom:calc(74px + env(safe-area-inset-bottom));overflow-x:hidden}
 ::selection{background:var(--load);color:#000}
 :focus-visible{outline:2px solid var(--aero);outline-offset:2px;border-radius:4px}
-
-/* ---------- shell ---------- */
 .wrap{max-width:640px;margin:0 auto;padding:0 var(--pad)}
 .view{display:none;padding-top:14px;animation:fade .18s ease}
 .view.on{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 
-/* ---------- masthead ---------- */
-.mast{
-  border-bottom:1px solid var(--line);
-  padding:calc(14px + env(safe-area-inset-top)) 0 12px;
-  background:linear-gradient(180deg,#12161d,var(--ink));
-}
-.eyebrow{
-  font-family:var(--mono);
-  font-size:10px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:var(--ash-dim);
-}
-.mast h1{
-  font-size:23px;
-  font-weight:800;
-  letter-spacing:-.02em;
-  margin-top:3px;
-  line-height:1.15;
-}
+.mast{border-bottom:1px solid var(--line);padding:calc(14px + env(safe-area-inset-top)) 0 12px;
+  background:linear-gradient(180deg,#12161d,var(--ink))}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ash-dim)}
+.mast h1{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-top:3px;line-height:1.15}
 .mast .sub{font-size:12.5px;color:var(--ash);margin-top:5px}
-.rule-line{
-  font-family:var(--mono);
-  font-size:11px;
-  color:var(--load);
-  margin-top:9px;
-  letter-spacing:.02em;
-  border-left:2px solid var(--load);
-  padding-left:9px;
-}
+
+/* ---- medical banner ---- */
+.med{border:1px solid #55242a;background:var(--halt-bg);border-radius:var(--r);padding:13px 15px;margin:14px 0}
+.med .nt{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--halt);margin-bottom:6px}
+.med p{font-size:13px;color:#d6c3c3;margin-bottom:7px}
+.med p:last-child{margin-bottom:0}
 
 /* ============================================================
-   SIGNATURE — THE TWO-LANE WEEK
-   Resistance rides the upper rail. Conditioning rides the lower.
-   The gap between them is the entire point of this redesign.
+   SIGNATURE — THE CYCLE SPINE
+   Six slots on a continuous vertical line. No weekdays anywhere:
+   the sequence is the structure, and rest happens between nodes.
    ============================================================ */
-.rail{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:4px;
-  margin:18px 0 8px;
-  padding:6px 0 8px;
-}
-.rail::before{
-  content:"";
-  position:absolute;
-  left:0;right:0;top:50%;
-  height:1px;
-  background:repeating-linear-gradient(90deg,var(--line) 0 5px,transparent 5px 10px);
-}
-.col{
-  position:relative;
-  display:grid;
-  grid-template-rows:52px 20px 52px;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
-.col .dow{
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  font-family:var(--mono);
-  font-size:9.5px;
-  letter-spacing:.08em;
-  color:var(--ash-dim);
-  background:var(--ink);
-  padding:0 3px;
-  z-index:2;
-}
-.chip{
-  overflow:hidden;
-  border-radius:8px;
-  border:1px solid var(--line);
-  background:var(--slab);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  padding:4px 2px;
-  transition:transform .14s ease,border-color .14s ease;
-}
-.col:active .chip{transform:scale(.95)}
-.chip .ct{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
-.chip .cs{font-size:8px;color:var(--ash-dim);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
-.chip.top{grid-row:1}
-.chip.bot{grid-row:3}
-.chip.load{border-color:#4a3413;background:var(--load-bg)}
-.chip.load .ct{color:var(--load)}
-.chip.aero{border-color:#123540;background:var(--aero-bg)}
-.chip.aero .ct{color:var(--aero)}
-.chip.rest{grid-row:1/4;align-self:center;height:52px;border-style:dashed;background:transparent}
-.chip.rest .ct{color:var(--ash-dim)}
-.col.sel .chip{border-color:var(--bone)}
-.col.sel .chip.load{box-shadow:0 0 0 1px var(--load) inset}
-.col.sel .chip.aero{box-shadow:0 0 0 1px var(--aero) inset}
-.tdot{
-  position:absolute;
-  bottom:-3px;left:50%;
-  transform:translateX(-50%);
-  width:5px;height:5px;
-  border-radius:50%;
-  background:var(--tendon);
-}
-.rail-key{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  font-family:var(--mono);
-  font-size:9.5px;
-  letter-spacing:.05em;
-  color:var(--ash-dim);
-  text-transform:uppercase;
-  padding-bottom:16px;
-  border-bottom:1px solid var(--line-soft);
-}
-.rail-key i{
-  display:inline-block;
-  width:7px;height:7px;
-  border-radius:2px;
-  margin-right:5px;
-  vertical-align:middle;
-}
+.spine{position:relative;padding-left:38px;margin-top:6px}
+.spine::before{content:"";position:absolute;left:14px;top:14px;bottom:34px;width:2px;
+  background:repeating-linear-gradient(180deg,var(--line) 0 6px,transparent 6px 12px)}
+.slot{position:relative;margin-bottom:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.slot .node{position:absolute;left:-38px;top:16px;width:30px;height:30px;border-radius:50%;
+  border:2px solid var(--line);background:var(--ink);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ash-dim)}
+.slot.load .node{border-color:var(--load);color:var(--load)}
+.slot.aero .node{border-color:var(--aero);color:var(--aero)}
+.slot .body{background:var(--slab);border:1px solid var(--line);border-radius:12px;padding:14px 15px;
+  transition:transform .14s ease,border-color .14s ease}
+.slot:active .body{transform:scale(.985)}
+.slot.load .body{border-left:3px solid var(--load)}
+.slot.aero .body{border-left:3px solid var(--aero)}
+.slot .kind{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash-dim)}
+.slot h3{font-size:19px;font-weight:750;letter-spacing:-.02em;margin:3px 0 4px}
+.slot .fx{font-size:13px;color:var(--ash);margin-bottom:11px}
+.slot .meta{display:flex;gap:6px;flex-wrap:wrap}
+.slot .meta span{font-family:var(--mono);font-size:10px;padding:4px 8px;border-radius:5px;
+  background:var(--ink);border:1px solid var(--line-soft);color:var(--ash)}
+.slot .go{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--load);margin-top:11px;display:block}
+.slot.aero .go{color:var(--aero)}
+.cyc-end{position:relative;padding-left:0;margin:2px 0 20px}
+.cyc-end .node{position:absolute;left:-38px;top:0;width:30px;height:30px;border-radius:50%;
+  border:2px dashed var(--line);background:var(--ink);display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--ash-dim)}
+.cyc-end p{font-size:12.5px;color:var(--ash-dim);padding-top:4px;margin:0}
 
-/* ---------- generic blocks ---------- */
-h2{
-  font-size:12px;
-  font-family:var(--mono);
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--ash);
-  margin:26px 0 10px;
-  padding-bottom:7px;
-  border-bottom:1px solid var(--line-soft);
-}
+/* ---- session detail ---- */
+.back{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash);
+  background:none;border:none;padding:6px 0 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.shead{border-left:3px solid var(--load);padding-left:13px;margin-bottom:16px}
+.shead.aero{border-color:var(--aero)}
+.shead .n{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--load)}
+.shead.aero .n{color:var(--aero)}
+.shead h2{font-size:26px;font-weight:800;letter-spacing:-.025em;margin:3px 0 4px;padding:0;border:none;
+  color:var(--bone);text-transform:none;font-family:var(--sans)}
+.shead .t{font-size:13px;color:var(--ash)}
+
+h2{font-size:12px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ash);
+  margin:26px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line-soft)}
 h2:first-of-type{margin-top:18px}
 h3{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:5px}
 p{font-size:14px;color:#c6c9d0;margin-bottom:10px}
 p.tight{margin-bottom:6px}
 strong{color:var(--bone);font-weight:650}
 .small{font-size:12.5px;color:var(--ash)}
+.card{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;margin-bottom:9px}
 
-.card{
-  background:var(--slab);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  padding:14px 15px;
-  margin-bottom:9px;
-}
-.card.flat{background:transparent}
-
-.note{
-  border-left:2px solid var(--line);
-  padding:11px 13px;
-  border-radius:0 var(--r) var(--r) 0;
-  background:var(--slab);
-  margin-bottom:10px;
-}
-.note .nt{
-  font-family:var(--mono);
-  font-size:10px;
-  letter-spacing:.13em;
-  text-transform:uppercase;
-  margin-bottom:5px;
-}
+.note{border-left:2px solid var(--line);padding:11px 13px;border-radius:0 var(--r) var(--r) 0;background:var(--slab);margin-bottom:10px}
+.note .nt{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:5px}
 .note p{font-size:13px;margin-bottom:0;color:#bcc0c9}
 .note p + p{margin-top:7px}
-.note.load{border-color:var(--load);background:var(--load-bg)}
-.note.load .nt{color:var(--load)}
-.note.aero{border-color:var(--aero);background:var(--aero-bg)}
-.note.aero .nt{color:var(--aero)}
-.note.tendon{border-color:var(--tendon);background:var(--tendon-bg)}
-.note.tendon .nt{color:var(--tendon)}
-.note.halt{border-color:var(--halt);background:var(--halt-bg)}
-.note.halt .nt{color:var(--halt)}
+.note.load{border-color:var(--load);background:var(--load-bg)}   .note.load .nt{color:var(--load)}
+.note.aero{border-color:var(--aero);background:var(--aero-bg)}   .note.aero .nt{color:var(--aero)}
+.note.tendon{border-color:var(--tendon);background:var(--tendon-bg)} .note.tendon .nt{color:var(--tendon)}
+.note.halt{border-color:var(--halt);background:var(--halt-bg)}   .note.halt .nt{color:var(--halt)}
+.note.ok{border-color:var(--ok);background:#12291d}              .note.ok .nt{color:var(--ok)}
 
-/* ---------- exercise cards ---------- */
-.ex{
-  background:var(--slab);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  margin-bottom:7px;
-  overflow:hidden;
-}
+/* numbered step list (warm-up, cool-down, prep) */
+.steps{counter-reset:st}
+.steps .s{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.steps .s:last-child{border-bottom:none}
+.steps .s .num{flex:0 0 22px;font-family:var(--mono);font-size:10px;color:var(--ash-dim);padding-top:3px}
+.steps .s .tx{flex:1}
+.steps .s .tt{font-size:13.5px;font-weight:600;line-height:1.4}
+.steps .s .td{font-size:12.5px;color:var(--ash);margin-top:2px;line-height:1.5}
+.steps .s .tm{font-family:var(--mono);font-size:11px;color:var(--load);margin-top:3px}
+
+/* exercises */
+.ex{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);margin-bottom:7px;overflow:hidden}
 .ex.hsr{border-left:2px solid var(--tendon)}
+.ex.neck{border-left:2px solid var(--halt)}
 .ex.opt{border-style:dashed}
-.ex-h{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:12px 14px;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
+.ex-h{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ex-h:active{background:var(--slab-hi)}
-.ex-n{
-  font-family:var(--mono);
-  font-size:10.5px;
-  color:var(--ash-dim);
-  min-width:16px;
-  padding-top:2px;
-}
+.ex-n{font-family:var(--mono);font-size:10.5px;color:var(--ash-dim);min-width:16px;padding-top:2px}
 .ex-b{flex:1;min-width:0}
 .ex-name{font-size:14px;font-weight:600;letter-spacing:-.005em}
-.ex-dose{
-  font-family:var(--mono);
-  font-size:12px;
-  color:var(--load);
-  margin-top:2px;
-  letter-spacing:.01em;
-}
+.ex-dose{font-family:var(--mono);font-size:12px;color:var(--load);margin-top:2px}
 .ex.hsr .ex-dose{color:var(--tendon)}
 .ex-car{color:var(--ash-dim);font-size:11px;transition:transform .2s}
 .ex.open .ex-car{transform:rotate(90deg)}
 .ex-d{display:none;padding:0 14px 14px;border-top:1px solid var(--line-soft)}
 .ex.open .ex-d{display:block}
-
-.spec{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:6px;
-  margin:12px 0 11px;
-}
-.spec div{
-  background:var(--ink);
-  border:1px solid var(--line-soft);
-  border-radius:6px;
-  padding:6px 8px;
-}
-.spec .k{
-  font-family:var(--mono);
-  font-size:8.5px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ash-dim);
-}
+.spec{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 11px}
+.spec div{background:var(--ink);border:1px solid var(--line-soft);border-radius:6px;padding:6px 8px}
+.spec .k{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash-dim)}
 .spec .v{font-family:var(--mono);font-size:12px;font-weight:600;margin-top:2px;white-space:nowrap}
-.why{font-size:12.5px;color:var(--ash);line-height:1.5}
+.why{font-size:12.5px;color:var(--ash);line-height:1.5;margin-top:11px}
 .why b{color:#c9ccd4;font-weight:600}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin:11px 0 2px}
+.pill{font-family:var(--mono);font-size:9.5px;padding:3px 7px;border-radius:5px;background:var(--ink);
+  border:1px solid var(--line);color:var(--ash)}
+.pill.hl{border-color:var(--tendon);color:var(--tendon)}
+.pill.warn{border-color:var(--halt);color:var(--halt)}
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 4px}
+@media (max-width:400px){.dd{grid-template-columns:1fr;gap:11px}}
+.dd h5{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.dd .do h5{color:var(--ok)} .dd .dont h5{color:var(--halt)}
+.dd .it{font-size:12px;color:#b6bac3;padding:4px 0 4px 15px;position:relative;line-height:1.45}
+.dd .do .it::before{content:"✓";position:absolute;left:0;top:4px;color:var(--ok);font-size:10px;font-weight:700}
+.dd .dont .it::before{content:"✕";position:absolute;left:0;top:4px;color:var(--halt);font-size:10px;font-weight:700}
+a.vid{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;margin-top:11px;
+  border-radius:8px;background:#2a1214;border:1px solid #55242a;color:#e88;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;text-decoration:none;-webkit-tap-highlight-color:transparent}
+a.vid:active{opacity:.75}
+a.vid.sm{padding:8px;font-size:10px;margin-top:9px}
 
-.sets{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center}
-.sets .lbl{
-  font-family:var(--mono);
-  font-size:9px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ash-dim);
-  margin-right:2px;
-}
-.tick{
-  width:30px;height:30px;
-  border-radius:7px;
-  border:1px solid var(--line);
-  background:var(--ink);
-  color:var(--ash-dim);
-  font-family:var(--mono);
-  font-size:11px;
-  cursor:pointer;
-  transition:all .12s;
-}
-.tick.done{background:var(--load);border-color:var(--load);color:#000;font-weight:700}
-.ex.hsr .tick.done{background:var(--tendon);border-color:var(--tendon)}
-
-/* ---------- tools ---------- */
-.tool{
-  background:var(--slab);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  padding:15px;
-  margin-bottom:10px;
-}
+/* tools */
+.tool{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-bottom:10px}
 .tool-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
 .tool-name{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash)}
 .tool-hint{font-size:11px;color:var(--ash-dim)}
-.readout{
-  font-family:var(--mono);
-  font-size:42px;
-  font-weight:700;
-  letter-spacing:-.03em;
-  line-height:1;
-  font-variant-numeric:tabular-nums;
-}
-.phase{
-  font-family:var(--mono);
-  font-size:11px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  margin-top:6px;
-  color:var(--ash);
-}
+.readout{font-family:var(--mono);font-size:42px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.phase{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:6px;color:var(--ash)}
 .bar{height:4px;background:var(--ink);border-radius:2px;margin:13px 0;overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--load);border-radius:2px}
-.bar i.aero{background:var(--aero)}
-.bar i.tendon{background:var(--tendon)}
+.bar i.aero{background:var(--aero)} .bar i.tendon{background:var(--tendon)}
 .btns{display:flex;gap:7px}
-button.b{
-  flex:1;
-  padding:11px;
-  border-radius:8px;
-  border:1px solid var(--line);
-  background:var(--slab-hi);
-  color:var(--bone);
-  font-family:var(--mono);
-  font-size:11px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
+button.b{flex:1;padding:11px;border-radius:8px;border:1px solid var(--line);background:var(--slab-hi);
+  color:var(--bone);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;-webkit-tap-highlight-color:transparent}
 button.b:active{transform:scale(.97)}
 button.b.go{background:var(--load);border-color:var(--load);color:#000;font-weight:700}
 button.b.go.aero{background:var(--aero);border-color:var(--aero)}
 button.b.go.tendon{background:var(--tendon);border-color:var(--tendon)}
-
-/* tempo pacer */
 .pacer{height:52px;background:var(--ink);border-radius:8px;position:relative;overflow:hidden;margin-bottom:12px;border:1px solid var(--line-soft)}
 .pacer i{position:absolute;top:0;bottom:0;left:0;width:3px;background:var(--tendon);box-shadow:0 0 12px var(--tendon)}
-.pacer span{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash);
-}
+.pacer span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash)}
 
-/* ---------- tables ---------- */
+/* HR */
+.hrbox{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-bottom:10px}
+.hrbig{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.hrsub{font-size:12px;color:var(--ash);margin-top:5px}
+.hrin{display:flex;gap:8px;align-items:center;margin-top:12px}
+.hrin input{width:76px;background:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px;
+  color:var(--bone);font-family:var(--mono);font-size:14px;text-align:center}
+.hrin label{font-size:11.5px;color:var(--ash-dim);line-height:1.35}
+
+/* tables */
 .tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px}
-.tbl th{
-  font-family:var(--mono);
-  font-size:9px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ash-dim);
-  text-align:left;
-  padding:7px 8px;
-  border-bottom:1px solid var(--line);
-  font-weight:500;
-}
+.tbl th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash-dim);
+  text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);font-weight:500}
 .tbl td{padding:8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
 .tbl td.m{font-family:var(--mono);font-size:12px;white-space:nowrap}
 .tbl tr:last-child td{border-bottom:none}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 calc(var(--pad) * -1);padding:0 var(--pad)}
-
-/* volume bars */
+.vd{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;padding:2px 6px;
+  border-radius:4px;white-space:nowrap;text-transform:uppercase}
+.vd.s{background:#123021;color:var(--ok)} .vd.p{background:var(--load-bg);color:var(--load)}
+.vd.c{background:var(--halt-bg);color:var(--halt)} .vd.u{background:var(--tendon-bg);color:var(--tendon)}
+.cite{font-family:var(--mono);font-size:10.5px;color:var(--ash-dim);line-height:1.6;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.cite b{color:var(--ash);font-weight:500}
 .vol{margin-bottom:9px}
 .vol-t{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
 .vol-t span:last-child{font-family:var(--mono);color:var(--ash);font-size:11.5px}
 .vol-b{height:6px;background:var(--ink);border-radius:3px;overflow:hidden;position:relative;border:1px solid var(--line-soft)}
 .vol-b i{display:block;height:100%;border-radius:3px;background:var(--ash-dim)}
-.vol-b i.pri{background:var(--load)}
-.vol-b i.reh{background:var(--tendon)}
+.vol-b i.pri{background:var(--load)} .vol-b i.reh{background:var(--tendon)}
 .vol-b u{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--line);text-decoration:none}
 
-/* verdict pills */
-.vd{
-  display:inline-block;
-  font-family:var(--mono);
-  font-size:8.5px;
-  letter-spacing:.08em;
-  padding:2px 6px;
-  border-radius:4px;
-  white-space:nowrap;
-  text-transform:uppercase;
-}
-.vd.s{background:#123021;color:var(--ok)}
-.vd.p{background:var(--load-bg);color:var(--load)}
-.vd.c{background:var(--halt-bg);color:var(--halt)}
-.vd.u{background:var(--tendon-bg);color:var(--tendon)}
-
-/* knee log */
-.scale{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin:12px 0}
-.scale button{
-  aspect-ratio:1;
-  border-radius:6px;
-  border:1px solid var(--line);
-  background:var(--ink);
-  color:var(--ash);
-  font-family:var(--mono);
-  font-size:11px;
-  cursor:pointer;
-}
-.scale button.on{background:var(--bone);color:#000;border-color:var(--bone);font-weight:700}
-.scale button.hi{border-color:var(--halt);color:var(--halt)}
-.scale button.hi.on{background:var(--halt);color:#000;border-color:var(--halt)}
-.verdict{
-  font-family:var(--mono);
-  font-size:12px;
-  letter-spacing:.03em;
-  padding:11px 13px;
-  border-radius:8px;
-  margin-top:11px;
-  line-height:1.5;
-}
-.verdict.go{background:#12291d;color:var(--ok);border:1px solid #1e4030}
-.verdict.hold{background:var(--load-bg);color:var(--load);border:1px solid #4a3413}
-.verdict.drop{background:var(--halt-bg);color:var(--halt);border:1px solid #4a1f1f}
-
-/* citations */
-.cite{
-  font-family:var(--mono);
-  font-size:10.5px;
-  color:var(--ash-dim);
-  line-height:1.6;
-  padding:9px 0;
-  border-bottom:1px solid var(--line-soft);
-}
-.cite b{color:var(--ash);font-weight:500}
-
-/* ---------- bottom nav ---------- */
-nav{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  background:rgba(14,17,22,.96);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  border-top:1px solid var(--line);
-  display:flex;
-  padding-bottom:env(safe-area-inset-bottom);
-  z-index:50;
-}
-nav button{
-  flex:1;min-width:0;
-  background:none;
-  border:none;
-  padding:11px 2px 12px;
-  color:var(--ash-dim);
-  font-family:var(--mono);
-  font-size:8.5px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  border-top:2px solid transparent;
-  margin-top:-1px;
-}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,17,22,.96);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;
+  padding-bottom:env(safe-area-inset-bottom);z-index:50}
+nav button{flex:1;min-width:0;background:none;border:none;padding:11px 2px 12px;color:var(--ash-dim);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;border-top:2px solid transparent;margin-top:-1px}
 nav button.on{color:var(--bone);border-top-color:var(--load)}
 nav button .ic{display:block;font-size:15px;margin-bottom:3px;line-height:1}
-
-.foot{
-  font-size:11px;
-  color:var(--ash-dim);
-  line-height:1.6;
-  padding:24px 0 10px;
-  border-top:1px solid var(--line-soft);
-  margin-top:28px;
-}
-
-
-/* ---------- today / landing ---------- */
-.hero{
-  border:1px solid var(--line);border-radius:14px;padding:17px 16px;margin-bottom:11px;
-  background:linear-gradient(150deg,#1d1508 0%,var(--slab) 62%);
-}
-.hero.aero{background:linear-gradient(150deg,#08222a 0%,var(--slab) 62%)}
-.hero.rest{background:linear-gradient(150deg,#191d25 0%,var(--slab) 62%)}
-.hero-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--load)}
-.hero.aero .hero-lbl{color:var(--aero)}
-.hero.rest .hero-lbl{color:var(--ash-dim)}
-.hero h2.hn{font-size:27px;font-weight:800;letter-spacing:-.025em;margin:4px 0 3px;padding:0;border:none;color:var(--bone);text-transform:none;font-family:var(--sans)}
-.hero .hs{font-size:13px;color:var(--ash);margin-bottom:13px}
-.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px}
-.hero-stats div{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 9px}
-.hero-stats .k{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash-dim)}
-.hero-stats .v{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:2px}
-
-.ring{display:flex;align-items:center;gap:13px;margin-bottom:13px}
-.ring svg{flex:0 0 auto;transform:rotate(-90deg)}
-.ring .rt{font-family:var(--mono);font-size:12px;color:var(--ash);line-height:1.5}
-.ring .rt b{color:var(--bone);font-size:14px}
-
-.check{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.check:last-child{border-bottom:none}
-.check .box{
-  flex:0 0 20px;width:20px;height:20px;border-radius:5px;border:1px solid var(--line);
-  background:var(--ink);margin-top:1px;font-family:var(--mono);font-size:11px;
-  display:flex;align-items:center;justify-content:center;color:transparent;
-}
-.check.on .box{background:var(--load);border-color:var(--load);color:#000}
-.check .ct2{font-size:13.5px;line-height:1.45}
-.check.on .ct2{color:var(--ash-dim);text-decoration:line-through}
-.check .cw{font-size:11.5px;color:var(--ash-dim);margin-top:2px;display:block}
-.check.on .cw{text-decoration:none}
-
-/* ---------- do / don't ---------- */
-.dd{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 4px}
-@media (max-width:400px){.dd{grid-template-columns:1fr;gap:11px}}
-.dd h5{
-  font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;
-  margin-bottom:6px;font-weight:700;
-}
-.dd .do h5{color:var(--ok)}
-.dd .dont h5{color:var(--halt)}
-.dd .it{font-size:12px;color:#b6bac3;padding:4px 0 4px 15px;position:relative;line-height:1.45}
-.dd .do .it::before{content:"✓";position:absolute;left:0;top:4px;color:var(--ok);font-size:10px;font-weight:700}
-.dd .dont .it::before{content:"✕";position:absolute;left:0;top:4px;color:var(--halt);font-size:10px;font-weight:700}
-
-/* ---------- pills + video ---------- */
-.pills{display:flex;gap:5px;flex-wrap:wrap;margin:11px 0 2px}
-.pill{
-  font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;
-  padding:3px 7px;border-radius:5px;background:var(--ink);border:1px solid var(--line);color:var(--ash);
-}
-.pill.hl{border-color:var(--tendon);color:var(--tendon)}
-a.vid{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  width:100%;padding:10px;margin-top:11px;border-radius:8px;
-  background:#2a1214;border:1px solid #55242a;color:#e88;
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
-  text-decoration:none;-webkit-tap-highlight-color:transparent;
-}
-a.vid:active{opacity:.75}
-a.vid.sm{padding:8px;font-size:10px;margin-top:9px}
-
-/* ---------- load log ---------- */
-.log{display:flex;gap:7px;align-items:center;margin-top:11px}
-.log input{
-  flex:1;background:var(--ink);border:1px solid var(--line);border-radius:7px;
-  padding:9px 10px;color:var(--bone);font-family:var(--mono);font-size:12.5px;
-}
-.log input::placeholder{color:var(--ash-dim)}
-.log input:focus{outline:none;border-color:var(--load)}
-.log .lg{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ash-dim);white-space:nowrap}
-
-/* ---------- HR calculator ---------- */
-.hrbox{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-bottom:10px}
-.hrbig{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-.hrsub{font-size:12px;color:var(--ash);margin-top:5px}
-.hrin{display:flex;gap:8px;align-items:center;margin-top:12px}
-.hrin input{
-  width:76px;background:var(--ink);border:1px solid var(--line);border-radius:7px;
-  padding:8px;color:var(--bone);font-family:var(--mono);font-size:14px;text-align:center;
-}
-.hrin label{font-size:11.5px;color:var(--ash-dim);line-height:1.35}
-
-/* ---------- week strip on other pages ---------- */
-.mini{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
-.mini div{
-  border-radius:6px;padding:7px 2px;text-align:center;border:1px solid var(--line);
-  font-family:var(--mono);font-size:9px;letter-spacing:.03em;color:var(--ash-dim);cursor:pointer;
-}
-.mini div.l{background:var(--load-bg);border-color:#4a3413;color:var(--load)}
-.mini div.a{background:var(--aero-bg);border-color:#123540;color:var(--aero)}
-.mini div.now{outline:1px solid var(--bone);outline-offset:1px}
-
-/* ---------- week/phase selector ---------- */
-.wksel{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
-.wksel button{
-  flex:0 0 auto;width:34px;height:34px;border-radius:7px;border:1px solid var(--line);
-  background:var(--slab);color:var(--ash);font-family:var(--mono);font-size:11px;cursor:pointer;
-}
-.wksel button.on{background:var(--bone);color:#000;border-color:var(--bone);font-weight:700}
-.wksel button.dl{border-color:var(--aero);color:var(--aero)}
-.wksel button.dl.on{background:var(--aero);color:#000}
-
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-}
-@media (max-width:360px){
-  .chip .ct{font-size:10.5px}
-  .chip .cs{display:none}
-  .col{grid-template-rows:46px 18px 46px}
-}
+.foot{font-size:11px;color:var(--ash-dim);line-height:1.6;padding:24px 0 10px;border-top:1px solid var(--line-soft);margin-top:28px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
 <header class="mast">
   <div class="wrap">
-    <div class="eyebrow">Protocol v2 · verified Aug 2026</div>
-    <h1>Full Separation Build</h1>
-    <div class="sub">39M · TRT · bilateral knee tendon rehab · strength, hypertrophy, longevity</div>
-    <div class="rule-line">Every day is EITHER resistance OR conditioning. Never both.</div>
+    <div class="eyebrow">Final plan · no phases · run in sequence</div>
+    <h1>Six-Slot Cycle</h1>
+    <div class="sub">Lower → Upper → Zone 2 → Lower → Upper → VO₂max · rest whenever you need to</div>
   </div>
 </header>
 
 <main class="wrap">
-  <section id="v-today" class="view on"></section>
-  <section id="v-week" class="view"></section>
-  <section id="v-train" class="view"></section>
+  <section id="v-cycle" class="view on"></section>
   <section id="v-knee" class="view"></section>
-  <section id="v-plan" class="view"></section>
+  <section id="v-nerve" class="view"></section>
+  <section id="v-notes" class="view"></section>
   <section id="v-eviq" class="view"></section>
   <div class="foot" id="foot"></div>
 </main>
 
 <nav>
-  <button data-v="today" class="on"><span class="ic">◉</span>Today</button>
-  <button data-v="train"><span class="ic">▲</span>Train</button>
+  <button data-v="cycle" class="on"><span class="ic">⛓</span>Cycle</button>
   <button data-v="knee"><span class="ic">◈</span>Knee</button>
-  <button data-v="plan"><span class="ic">⟶</span>Plan</button>
-  <button data-v="week"><span class="ic">▤</span>Week</button>
+  <button data-v="nerve"><span class="ic">⚡</span>Nerve</button>
+  <button data-v="notes"><span class="ic">⟶</span>Notes</button>
   <button data-v="eviq"><span class="ic">§</span>Data</button>
 </nav>
 
 <script>
-/* ============================================================
-   STORAGE — artifact storage when available, memory otherwise.
-   Never throws; the app works fully without persistence.
-   ============================================================ */
-const mem = {};
-const store = {
-  async get(k){
-    try{ if(window.storage){ const r = await window.storage.get(k,false); return r ? JSON.parse(r.value) : (mem[k]??null); } }catch(e){}
-    return mem[k] ?? null;
-  },
-  async set(k,v){
-    mem[k]=v;
-    try{ if(window.storage){ await window.storage.set(k,JSON.stringify(v),false); } }catch(e){}
-  }
+const CUES = {
+"Spanish squat isometric":{t:"Quads · patellar tendon",eq:"Heavy band + rack",vid:"Spanish squat isometric patellar tendinopathy setup",
+ do:["Anchor a thick band behind the knees at knee height, not higher","Keep the torso near-vertical the whole hold — shins go forward, chest stays up","Sit back into the band until you feel it load the front of the knee","Aim for ~70% effort: hard, but you could hold 60 s if forced","Stop the set if pain climbs above 3/10"],
+ dont:["Don't let the torso pitch forward — that turns it into a hip exercise","Don't anchor the band low; it drags the knees down instead of back","Don't do this right before heavy hack squats if it leaves the quads cooked","Don't treat it as a required stage — it's optional (n=6 evidence)"]},
+
+"Hack squat or pendulum squat":{t:"Quads · patellar tendon",eq:"Hack or pendulum machine",vid:"hack squat form tempo heavy slow resistance",
+ do:["Count it out loud: 3 seconds down, 3 seconds up, every rep","Feet mid-platform, roughly shoulder width — this is a quad movement","Descend to the deepest range you can hold ≤3/10 pain, then own it","Add load only when the previous tier passed the 24-hour rule twice","Keep the low back flat against the pad throughout"],
+ dont:["Don't bounce out of the bottom — the eccentric is the point","Don't let the tempo break on the last two reps; the set ended there","Don't chase depth past the pain rule to prove something","Don't place feet high on the platform — that shifts load to the hips"]},
+
+"Leg press":{t:"Quads · glutes",eq:"Leg press",vid:"leg press form knee safe foot placement",
+ do:["Feet mid-platform, hip width, toes very slightly out","Lower until the pelvis is about to tuck, then drive","Keep a soft knee at the top — never slam into lockout","Use this to test single-leg 150% bodyweight every 4 weeks"],
+ dont:["Don't let the lower back round off the pad at the bottom","Don't lock out hard and hang on the joints between reps","Don't go so heavy the tempo collapses","Don't put your hands on your knees to push"]},
+
+"Seated leg extension — long length":{t:"Quads · patellar tendon",eq:"Leg extension",vid:"leg extension long length partial rectus femoris",
+ do:["Sit tall or slightly reclined so the quad starts stretched","3 seconds up, 3 seconds down — this is a tendon-loading set","Set the pad just above the ankle, not on the shin","Pause a beat at the top only if it stays under 3/10"],
+ dont:["Don't kick explosively into extension","Don't let the weight drop back — the lowering phase is where the tendon works","Don't grip the handles and rock the torso to cheat reps","Don't skip this because it 'isn't functional' — it's the cleanest tendon dose you have"]},
+
+"Seated leg extension":{t:"Quads · patellar tendon",eq:"Leg extension",vid:"leg extension form tempo controlled",
+ do:["Same 3s/3s tempo as Lower A — this is the second weekly tendon dose","Match reps left and right; lead with the left","Keep the hips pinned to the seat back","Log the load so you can drive the 15RM → 6RM track"],
+ dont:["Don't let this become an afterthought at the end of the session","Don't add extra sets on the left just because it's worse","Don't swing into the top position","Don't progress load if yesterday's knee score was above 3"]},
+
+"Romanian deadlift":{t:"Hamstrings · erectors",eq:"Barbell or DBs",vid:"Romanian deadlift form hip hinge technique",
+ do:["Push the hips back; the bar stays in contact with the legs","Lower until you feel a hard hamstring stretch, then stop","Keep the ribs down and the mid-back braced","Squeeze the glutes to finish — don't lean back past neutral"],
+ dont:["Don't turn it into a squat by bending the knees more as you descend","Don't round the lower back to chase extra range","Don't bounce the plates off the floor","Don't grind this to failure — it's a fatigue-expensive lift"]},
+
+"Standing calf raise — straight knee":{t:"Gastrocnemius",eq:"Standing calf machine",vid:"standing calf raise gastrocnemius full range",
+ do:["Keep the knee straight — that's what loads the gastroc","Full range: deep stretch at the bottom, hard squeeze at the top","2 seconds up, 2 second pause, 2 seconds down","Balls of the feet on the block, heels free to drop below"],
+ dont:["Don't bend the knees — that shifts the work to the soleus","Don't bounce out of the stretch using the Achilles like a spring","Don't cut the range short to add weight","Don't rush — calves respond to time under tension"]},
+
+"Seated calf raise — bent knee":{t:"Soleus",eq:"Seated calf machine",vid:"seated calf raise soleus form",
+ do:["Knees bent ~90° — this is what isolates the soleus","Pad sits low on the thigh, close to the knee","Full stretch at the bottom, pause at the top","Higher reps (12–15) suit the soleus's fibre profile"],
+ dont:["Don't half-rep it — the stretch is where the growth is","Don't let the heels bounce","Don't skip this thinking standing raises cover it — they don't","Don't place the pad on the mid-thigh; it slides"]},
+
+"Tibialis anterior raise":{t:"Tibialis anterior",eq:"Tib bar, band or wall",vid:"tibialis anterior raise tib bar knee health",
+ do:["Heels planted, pull the toes up toward the shins","Slow lowering — 2 seconds down","Expect a strong burn; that's the point","Do these on both lower days for ankle and knee balance"],
+ dont:["Don't bend the knees to help pull the toes up","Don't rush the reps — the range is short, so tempo is all you have","Don't skip it because it feels trivial; dorsiflexion drives knee tracking"]},
+
+"Hip abduction — glute medius":{t:"Glute medius",eq:"Machine, cable or band",vid:"hip abduction glute medius activation form",
+ do:["Lead with the left leg, then match reps on the right","Slight forward lean loads the glute med more than the TFL","Pause 1 second at the end range","Feel it in the side of the hip, not the lower back"],
+ dont:["Don't swing the torso to move the weight","Don't let the pelvis rotate — keep it square","Don't go so heavy the pause disappears"]},
+
+"Copenhagen adduction — short lever":{t:"Adductors",eq:"Bench",vid:"Copenhagen adduction short lever progression",
+ do:["Support the bottom knee on the bench — that's the short lever","Lift the hips until the body is a straight line","Lead with the left","Progress to the long-lever (foot on bench) version only when 3×10 is easy"],
+ dont:["Don't start with the long lever — adductor strains come from exactly that","Don't let the hips sag between reps","Don't hold your breath through the set"]},
+
+"Copenhagen adduction":{t:"Adductors",eq:"Bench",vid:"Copenhagen adduction long lever form",
+ do:["Top foot on the bench, body in a straight line","Lift the bottom leg to meet the top leg","Lead with the left side","Regress to knee-supported if the groin complains at all"],
+ dont:["Don't rotate the torso to make it easier","Don't push through groin pain — this is a prevention exercise, not a rehab one","Don't add reps faster than the adductors adapt"]},
+
+"Hanging leg raise":{t:"Core · hip flexors",eq:"Bar or straps",vid:"hanging leg raise form posterior pelvic tilt",
+ do:["Start each rep by tilting the pelvis, not by lifting the legs","Control the descent — no swinging","Bend the knees if the straight-leg version breaks form"],
+ dont:["Don't use momentum from a swing","Don't arch hard at the bottom","Don't let the shoulders go completely passive in the hang"]},
+
+"Bench press — barbell or machine":{t:"Chest · triceps · front delts",eq:"Barbell or machine",vid:"bench press form setup arch shoulder safe",
+ do:["Set the shoulder blades down and back before you unrack","Elbows at roughly 45–60°, not flared to 90°","Touch the chest under control; drive back in a slight arc","Keep 2–3 reps in reserve — this is a strength lift, not a test"],
+ dont:["Don't bounce the bar off the chest","Don't let the elbows flare wide — that's where shoulders get hurt","Don't lift the hips off the bench","Don't train to failure on a barbell without a spotter"]},
+
+"Chest-supported row":{t:"Mid-back · rhomboids · lats",eq:"Chest-supported row machine",vid:"chest supported row form mid back",
+ do:["Pull with the elbows, not the hands","Squeeze the shoulder blades together at the end range","Let the shoulder blades travel forward on the stretch","Chest stays glued to the pad the whole set"],
+ dont:["Don't heave the chest off the pad to move more weight","Don't shrug the traps up as you pull","Don't cut the stretch short at the bottom"]},
+
+"Incline DB press ~30°":{t:"Upper chest",eq:"Dumbbells + incline bench",vid:"incline dumbbell press 30 degree upper chest form",
+ do:["Set the bench to about 30° — steeper turns it into a shoulder press","Lower until you feel a deep chest stretch","Keep the wrists stacked over the elbows","Press slightly inward at the top"],
+ dont:["Don't set the incline at 45° or more","Don't clash the dumbbells together at the top","Don't let the elbows drop below a comfortable stretch"]},
+
+"Lat pulldown or pull-up":{t:"Lats",eq:"Pulldown or bar",vid:"lat pulldown form lats not biceps",
+ do:["Start from a full overhead stretch, letting the shoulder blades rise","Drive the elbows down and slightly back toward the hip pockets","Slight backward torso lean, held constant","Control the way up — don't let it rip your arms straight"],
+ dont:["Don't lean back and turn it into a row","Don't pull behind the neck","Don't use so much weight that you generate momentum with the hips"]},
+
+"Cable lateral raise":{t:"Side delts",eq:"Cable",vid:"cable lateral raise side delt form",
+ do:["Cable set low, running across the body for tension at the bottom","Lead with the elbow, raise to about shoulder height","Slow lowering — the stretched position is where cables beat dumbbells","High reps, 0–1 RIR; this is a small muscle"],
+ dont:["Don't shrug the traps up to finish the rep","Don't swing the torso to launch the arm","Don't go above shoulder height — the traps take over"]},
+
+"Leaning cable lateral raise":{t:"Side delts",eq:"Cable + upright",vid:"leaning cable lateral raise side delt stretch",
+ do:["Hold the upright and lean away — this increases tension at the bottom","Keep a fixed slight elbow bend","Raise to shoulder height, lower over 2 seconds","Different enough from Upper A's version to avoid junk volume"],
+ dont:["Don't let the lean change mid-set","Don't jerk out of the bottom","Don't chase weight — tension beats load here"]},
+
+"Overhead cable triceps extension":{t:"Triceps long head",eq:"Cable + rope",vid:"overhead cable triceps extension long head form",
+ do:["Get the elbows genuinely overhead — that's what lengthens the long head","Keep the elbows narrow and pointed forward","Full stretch behind the head each rep","Expect to use less weight than a pushdown — that's fine and expected"],
+ dont:["Don't let the elbows drift wide as you fatigue","Don't shorten the range to add load — the stretch is the whole reason this exercise is here","Don't let the torso pitch forward to help"]},
+
+"Incline DB curl":{t:"Biceps long head",eq:"Dumbbells + incline bench",vid:"incline dumbbell curl long head stretch form",
+ do:["Bench at ~45–60°, let the arms hang fully behind the torso","Keep the upper arm still — only the forearm moves","Control the lowering into the stretch","Light weight is correct here; the position is the stimulus"],
+ dont:["Don't let the elbows drift forward as you curl","Don't sit up to help the last reps","Don't cut the bottom range — that's the entire point of the incline"]},
+
+"Face pull + external rotation":{t:"Rear delts · rotator cuff",eq:"Cable + rope",vid:"face pull external rotation shoulder health form",
+ do:["Cable set at roughly face height","Pull toward the forehead, finishing with the hands above the elbows","Externally rotate at the end — knuckles back","High reps, light load, 2 RIR"],
+ dont:["Don't turn it into a heavy row","Don't let the elbows drop below the wrists","Don't shrug into the movement"]},
+
+"Wrist curl + reverse wrist curl":{t:"Forearms",eq:"Barbell, DBs or cable",vid:"wrist curl reverse wrist curl forearm training",
+ do:["Forearms supported on a bench or thighs","Full range: let the bar roll to the fingertips on wrist curls","Reverse curls with a lighter load — extensors are weaker","High reps, controlled"],
+ dont:["Don't use the same weight for both directions","Don't bounce at the end range","Don't ignore the reverse version — it's the one that protects the elbow"]},
+
+"Suitcase carry":{t:"Grip · core · traps",eq:"Dumbbell or KB",vid:"suitcase carry form anti lateral flexion",
+ do:["One heavy weight, one side, walk tall","Resist the sideways lean — that's the core work","Shoulders level, ribs down","Switch sides each trip"],
+ dont:["Don't let the torso tip toward the weight","Don't shrug the loaded side up","Don't shuffle — take normal walking steps"]},
+
+"Bulgarian split squat or walking lunge":{t:"Quads · glutes · single-leg control",eq:"DBs + bench",vid:"Bulgarian split squat form knee friendly setup",
+ do:["Lead with the LEFT leg, then match the rep count on the right","Longer stride puts more on the glutes; shorter puts more on the quads","Control the descent — 3 seconds down","Front shin can travel forward if the knee stays under 3/10"],
+ dont:["Don't let the front knee cave inward","Don't bounce the back knee off the floor","Don't let the strong side set the rep count","Don't add load while balance is still the limiting factor"]},
+
+"Hip thrust":{t:"Glute max",eq:"Barbell + bench",vid:"hip thrust form glute max setup",
+ do:["Bench under the shoulder blades, chin tucked","Drive through the heels, finish with a hard glute squeeze","Ribs down — don't hyperextend the lower back at the top","Pause 1 second at lockout"],
+ dont:["Don't arch the lower back to fake extra range","Don't let the knees drift out or in","Don't bounce off the floor between reps"]},
+
+"Seated leg curl":{t:"Hamstrings",eq:"Seated leg curl",vid:"seated leg curl hamstring long length form",
+ do:["Seated beats lying here — it trains the hamstrings at longer length","Hips strapped down, torso upright","3 seconds on the lowering phase","Full range: let the knees straighten between reps"],
+ dont:["Don't let the hips lift off the seat","Don't slam the weight stack on the return","Don't shorten the range to add plates"]},
+
+"Nordic hamstring eccentric":{t:"Hamstrings (eccentric)",eq:"Partner, pad or GHD",vid:"Nordic hamstring curl progression beginner",
+ do:["Lower as slowly as you can control — 4 to 6 seconds","Keep the hips extended; body stays in a straight line","Catch yourself with the hands and push back up","Regress with a band or partial range if you can't control the last third"],
+ dont:["Don't break at the hips — that halves the load and the benefit","Don't do these the day before a heavy lower session","Don't add reps quickly — this causes serious soreness","Don't attempt full range before you can control half"]},
+
+"Pallof press":{t:"Core (anti-rotation)",eq:"Cable or band",vid:"Pallof press anti rotation core form",
+ do:["Stand side-on to the cable, press straight out from the sternum","Resist the rotation — nothing should twist","Brace the ribs down, breathe normally","Hold 1–2 seconds at full extension"],
+ dont:["Don't let the torso rotate toward the stack","Don't hold your breath","Don't use so much weight that you lean away to counterbalance"]},
+
+"Seated supported overhead press":{t:"Front delts · triceps",eq:"Machine or DBs, back supported",vid:"seated dumbbell shoulder press form back supported",
+ do:["Back flat against the pad — this is the whole point of the change","Exhale as you press. Never hold your breath under load","Keep the chin lightly tucked and the neck neutral throughout","Stop the set if any tingling appears in the hand, arm or face"],
+ dont:["Don't press standing while the cervical symptoms are unresolved","Don't brace by holding your breath — that spikes cranial pressure","Don't crane the head forward or back to watch the weight","Don't press behind the neck, ever"]},
+
+"Weighted pull-up or neutral-grip pulldown":{t:"Lats",eq:"Bar or pulldown",vid:"weighted pull up form neutral grip",
+ do:["Use a different grip from Upper A so the stimulus isn't a duplicate","Full hang at the bottom, chest to the bar at the top","Control the descent for 2 seconds","Add load only when you hit the top of the rep range clean"],
+ dont:["Don't kip or swing","Don't stop halfway down to save the next rep","Don't shrug at the bottom of the hang"]},
+
+"Dip or decline press":{t:"Lower chest · triceps",eq:"Dip bars or bench",vid:"chest dip form shoulder safe depth",
+ do:["Lean the torso forward to bias the chest","Descend until the upper arms are roughly parallel","Keep the shoulders down, away from the ears","Stop the range where the shoulder stays comfortable"],
+ dont:["Don't drop into the bottom uncontrolled","Don't go so deep the shoulders round forward","Don't add weight while depth is still inconsistent"]},
+
+"Cable row — different handle to Upper A":{t:"Mid-back · lats",eq:"Cable row",vid:"cable row form back not biceps",
+ do:["Change the handle and angle versus Upper A's row","Let the shoulder blades stretch forward at the front","Pull to the lower ribs, elbows close","Torso stays still — no rowing motion from the hips"],
+ dont:["Don't rock back and forth","Don't shrug at the finish","Don't repeat the exact chest-supported row pattern — that's junk volume"]},
+
+"Shrug — moderate load":{t:"Upper traps",eq:"Dumbbells",vid:"dumbbell shrug form upper trap light",
+ do:["Moderate load only — this is deliberately not a heavy movement now","Straight up and down; traps elevate, they don't rotate","Exhale on the way up, breathe normally throughout","Stop immediately if you feel anything in the neck, jaw or hand"],
+ dont:["Don't load these heavily while the cervical symptoms are unresolved","Don't use straps to chase a heavier top set","Don't roll the shoulders","Don't hold your breath"]},
+
+"Reverse pec deck / rear-delt flye":{t:"Rear delts",eq:"Pec deck or cables",vid:"reverse pec deck rear delt form",
+ do:["Lead with the elbows, arms nearly straight","Think 'spread the arms', not 'squeeze the blades'","High reps, 0–1 RIR","Slight forward lean of the torso"],
+ dont:["Don't turn it into a row by bending the elbows","Don't jerk the weight out","Don't let the traps take over"]},
+
+"Preacher or cable curl":{t:"Biceps (short-mid length)",eq:"Preacher bench or cable",vid:"preacher curl form biceps",
+ do:["Deliberately different length position from Upper A's incline curl","Armpits pressed into the pad","Control the lowering — this is where preacher curls bite","Stop just short of full elbow lockout at the bottom under heavy load"],
+ dont:["Don't let the elbows lift off the pad","Don't bounce out of the bottom","Don't repeat the incline curl pattern here"]},
+
+"Hammer curl":{t:"Brachialis · brachioradialis",eq:"Dumbbells",vid:"hammer curl brachialis form",
+ do:["Neutral grip throughout — thumbs up","Keep the elbows pinned to the sides","Control both directions","Cross-body variation is fine and slightly better for the brachialis"],
+ dont:["Don't swing from the shoulders","Don't rotate into a supinated curl","Don't let the elbows travel forward"]},
+
+"Rope pushdown or skullcrusher":{t:"Triceps lateral · medial heads",eq:"Cable or EZ bar",vid:"triceps rope pushdown form lateral head",
+ do:["Elbows pinned to the sides, only the forearms move","Spread the rope apart at the bottom","Full lockout, then control back up","This complements the overhead angle — both are needed"],
+ dont:["Don't lean over the cable and turn it into a press","Don't let the elbows drift forward or flare","Don't use so much weight the shoulders join in"]},
+
+"External rotation — cable or band":{t:"Rotator cuff",eq:"Cable or band",vid:"cable external rotation rotator cuff form",
+ do:["Elbow tucked at the side, bent 90°","Rotate the forearm outward, slow and controlled","Very light load, 2 RIR, high reps","A rolled towel under the elbow helps keep position"],
+ dont:["Don't let the elbow drift away from the ribs","Don't extend the shoulder backward to cheat range","Don't load this heavily — it's joint health work"]}
 };
-let state = { ticks:{}, knee:[], loads:{}, daily:{}, week:1, age:39, hrmax:null };
-
-/* ============================================================
-   THE WEEK — two lanes. Resistance rides top, conditioning bottom.
-   ============================================================ */
-const WEEK = [
-  {d:"MON", lane:"top", key:"lowerA", t:"LO A", full:"Lower A", s:"quad", tendon:true,
-   why:"Heaviest tendon session lands on the freshest tissue, straight off the rest day."},
-  {d:"TUE", lane:"top", key:"upperA", t:"UP A", full:"Upper A", s:"horiz",
-   why:"Legs offloaded the day after heavy knee work. No aerobic stress anywhere near it."},
-  {d:"WED", lane:"bot", key:"zone2", t:"Z2", full:"Zone 2", s:"45–60m",
-   why:"Lowest-cost aerobic block, doubling as active recovery between the two lower days."},
-  {d:"THU", lane:"top", key:"lowerB", t:"LO B", full:"Lower B", s:"hip", tendon:true,
-   why:"72 h after Lower A — full recovery of the knee extensor mechanism."},
-  {d:"FRI", lane:"top", key:"upperB", t:"UP B", full:"Upper B", s:"vert",
-   why:"72 h after Upper A. Legs rest ahead of Saturday's intervals."},
-  {d:"SAT", lane:"bot", key:"vo2", t:"4×4", full:"Norwegian 4×4", s:"or Z2",
-   why:"~48 h clear of the last heavy lower session — double the ≥24 h minimum."},
-  {d:"SUN", lane:"rest", key:"rest", t:"REST", full:"Rest", s:"",
-   why:"One genuine off day, positioned to precede the heaviest tendon session."}
-];
-
-/* ============================================================
-   SESSIONS
-   dose fields drive both the UI and the weekly volume computation.
-   m = muscles credited: [name, directSets] ; i = indirect (counted 0.5)
-   ============================================================ */
 const S = {
 lowerA:{
   name:"Lower A", tag:"Quad / knee focus + primary tendon load", lane:"top", day:"MON",
@@ -822,9 +530,9 @@ upperB:{
   name:"Upper B", tag:"Vertical push/pull", lane:"top", day:"FRI",
   head:"Vertical pressing and pulling, plus the second dose of every arm, delt and forearm target.",
   ex:[
-   {n:"Overhead press", dose:"4 × 5–8", sets:4,
+   {n:"Seated supported overhead press", dose:"4 × 6–8", sets:4, neck:true,
     rir:"2–3", rest:"3 min", tempo:"2 / 1 / 1",
-    why:"Primary vertical press, strength emphasis. Seated or standing — standing adds core demand, seated adds load.", m:[["Front delts",4]], i:[["Triceps",4],["Side delts",4]]},
+    why:"Primary vertical press. <b>Changed from standing to seated with a back pad</b> because of the cervical symptoms — a standing press loads the neck stabilisers and invites breath-holding. Machine or dumbbells, back supported, exhale on the way up.", m:[["Front delts",4]], i:[["Triceps",4],["Side delts",4]]},
    {n:"Weighted pull-up or neutral-grip pulldown", dose:"4 × 6–10", sets:4,
     rir:"1–2", rest:"2–3 min", tempo:"2 / 1 / 2",
     why:"Loaded vertical pull. Different grip from Upper A so the stimulus is not a duplicate.", m:[["Lats / mid-back",4]], i:[["Biceps",4]]},
@@ -837,9 +545,9 @@ upperB:{
    {n:"Leaning cable lateral raise", dose:"4 × 12–20", sets:4,
     rir:"0–1", rest:"90 s", tempo:"2 / 1 / 2",
     why:"Side delts. Leaning away increases the moment arm at the lengthened position. <b>+1 set</b> from the half day.", m:[["Side delts",4]], i:[]},
-   {n:"Shrug", dose:"3 × 10–15", sets:3,
-    rir:"1–2", rest:"90 s", tempo:"2 / 1 / 2",
-    why:"Upper traps.", m:[["Traps",3]], i:[]},
+   {n:"Shrug — moderate load", dose:"2 × 12–15", sets:2, neck:true,
+    rir:"2–3", rest:"90 s", tempo:"2 / 1 / 2",
+    why:"Upper traps, <b>deliberately lightened</b>. Heavy shrugs load exactly the tissue implicated in your symptoms. Moderate weight, no straps, no breath-holding, stop the set early rather than grinding.", m:[["Traps",2]], i:[]},
    {n:"Reverse pec deck / rear-delt flye", dose:"3 × 15–20", sets:3,
     rir:"0–1", rest:"60 s", tempo:"2 / 1 / 2",
     why:"Rear delts, second weekly dose.", m:[["Rear delts",3]], i:[]},
@@ -857,14 +565,11 @@ upperB:{
     why:"Rotator cuff, second dose.", m:[["Rotator cuff",2]], i:[]},
    {n:"Wrist curl + reverse wrist curl", dose:"2 × 15–20 each", sets:4,
     rir:"1", rest:"45 s", tempo:"2 / 1 / 2",
-    why:"Forearms, second dose.", m:[["Forearms / grip",4]], i:[]},
-   {n:"Neck flexion / extension", dose:"2 × 15", sets:2, opt:true,
-    rir:"2", rest:"60 s", tempo:"slow",
-    why:"<b>Optional.</b> Include only if contact-sport or athletic goals apply. Otherwise omit entirely.", m:[["Neck (optional)",2]], i:[]}
+    why:"Forearms, second dose.", m:[["Forearms / grip",4]], i:[]}
   ]}
 };
 
-/* Conditioning days */
+
 const COND = {
 zone2:{
   name:"Zone 2", tag:"Standalone · 45–60 min", lane:"bot", day:"WED",
@@ -884,180 +589,7 @@ vo2:{
   swap:["Resting HR elevated ≥7 bpm above baseline","Sleep under 6 h, or two poor nights running","Knee pain above 3/10 at rest","Thursday's Lower B still sore on Saturday","Any deload week","Hematocrit or BP trending up — pause and call your prescriber"]
 }};
 
-/* ============================================================
-   COACHING LAYER — cues, targets, form references
-   yt() builds a YouTube search rather than a fixed video ID, so
-   links never rot and you can pick the coach you trust.
-   ============================================================ */
-const yt = q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
 
-const CUES = {
-"Spanish squat isometric":{t:"Quads · patellar tendon",eq:"Heavy band + rack",vid:"Spanish squat isometric patellar tendinopathy setup",
- do:["Anchor a thick band behind the knees at knee height, not higher","Keep the torso near-vertical the whole hold — shins go forward, chest stays up","Sit back into the band until you feel it load the front of the knee","Aim for ~70% effort: hard, but you could hold 60 s if forced","Stop the set if pain climbs above 3/10"],
- dont:["Don't let the torso pitch forward — that turns it into a hip exercise","Don't anchor the band low; it drags the knees down instead of back","Don't do this right before heavy hack squats if it leaves the quads cooked","Don't treat it as a required stage — it's optional (n=6 evidence)"]},
-
-"Hack squat or pendulum squat":{t:"Quads · patellar tendon",eq:"Hack or pendulum machine",vid:"hack squat form tempo heavy slow resistance",
- do:["Count it out loud: 3 seconds down, 3 seconds up, every rep","Feet mid-platform, roughly shoulder width — this is a quad movement","Descend to the deepest range you can hold ≤3/10 pain, then own it","Add load only when the previous tier passed the 24-hour rule twice","Keep the low back flat against the pad throughout"],
- dont:["Don't bounce out of the bottom — the eccentric is the point","Don't let the tempo break on the last two reps; the set ended there","Don't chase depth past the pain rule to prove something","Don't place feet high on the platform — that shifts load to the hips"]},
-
-"Leg press":{t:"Quads · glutes",eq:"Leg press",vid:"leg press form knee safe foot placement",
- do:["Feet mid-platform, hip width, toes very slightly out","Lower until the pelvis is about to tuck, then drive","Keep a soft knee at the top — never slam into lockout","Use this to test single-leg 150% bodyweight every 4 weeks"],
- dont:["Don't let the lower back round off the pad at the bottom","Don't lock out hard and hang on the joints between reps","Don't go so heavy the tempo collapses","Don't put your hands on your knees to push"]},
-
-"Seated leg extension — long length":{t:"Quads · patellar tendon",eq:"Leg extension",vid:"leg extension long length partial rectus femoris",
- do:["Sit tall or slightly reclined so the quad starts stretched","3 seconds up, 3 seconds down — this is a tendon-loading set","Set the pad just above the ankle, not on the shin","Pause a beat at the top only if it stays under 3/10"],
- dont:["Don't kick explosively into extension","Don't let the weight drop back — the lowering phase is where the tendon works","Don't grip the handles and rock the torso to cheat reps","Don't skip this because it 'isn't functional' — it's the cleanest tendon dose you have"]},
-
-"Seated leg extension":{t:"Quads · patellar tendon",eq:"Leg extension",vid:"leg extension form tempo controlled",
- do:["Same 3s/3s tempo as Lower A — this is the second weekly tendon dose","Match reps left and right; lead with the left","Keep the hips pinned to the seat back","Log the load so you can drive the 15RM → 6RM track"],
- dont:["Don't let this become an afterthought at the end of the session","Don't add extra sets on the left just because it's worse","Don't swing into the top position","Don't progress load if yesterday's knee score was above 3"]},
-
-"Romanian deadlift":{t:"Hamstrings · erectors",eq:"Barbell or DBs",vid:"Romanian deadlift form hip hinge technique",
- do:["Push the hips back; the bar stays in contact with the legs","Lower until you feel a hard hamstring stretch, then stop","Keep the ribs down and the mid-back braced","Squeeze the glutes to finish — don't lean back past neutral"],
- dont:["Don't turn it into a squat by bending the knees more as you descend","Don't round the lower back to chase extra range","Don't bounce the plates off the floor","Don't grind this to failure — it's a fatigue-expensive lift"]},
-
-"Standing calf raise — straight knee":{t:"Gastrocnemius",eq:"Standing calf machine",vid:"standing calf raise gastrocnemius full range",
- do:["Keep the knee straight — that's what loads the gastroc","Full range: deep stretch at the bottom, hard squeeze at the top","2 seconds up, 2 second pause, 2 seconds down","Balls of the feet on the block, heels free to drop below"],
- dont:["Don't bend the knees — that shifts the work to the soleus","Don't bounce out of the stretch using the Achilles like a spring","Don't cut the range short to add weight","Don't rush — calves respond to time under tension"]},
-
-"Seated calf raise — bent knee":{t:"Soleus",eq:"Seated calf machine",vid:"seated calf raise soleus form",
- do:["Knees bent ~90° — this is what isolates the soleus","Pad sits low on the thigh, close to the knee","Full stretch at the bottom, pause at the top","Higher reps (12–15) suit the soleus's fibre profile"],
- dont:["Don't half-rep it — the stretch is where the growth is","Don't let the heels bounce","Don't skip this thinking standing raises cover it — they don't","Don't place the pad on the mid-thigh; it slides"]},
-
-"Tibialis anterior raise":{t:"Tibialis anterior",eq:"Tib bar, band or wall",vid:"tibialis anterior raise tib bar knee health",
- do:["Heels planted, pull the toes up toward the shins","Slow lowering — 2 seconds down","Expect a strong burn; that's the point","Do these on both lower days for ankle and knee balance"],
- dont:["Don't bend the knees to help pull the toes up","Don't rush the reps — the range is short, so tempo is all you have","Don't skip it because it feels trivial; dorsiflexion drives knee tracking"]},
-
-"Hip abduction — glute medius":{t:"Glute medius",eq:"Machine, cable or band",vid:"hip abduction glute medius activation form",
- do:["Lead with the left leg, then match reps on the right","Slight forward lean loads the glute med more than the TFL","Pause 1 second at the end range","Feel it in the side of the hip, not the lower back"],
- dont:["Don't swing the torso to move the weight","Don't let the pelvis rotate — keep it square","Don't go so heavy the pause disappears"]},
-
-"Copenhagen adduction — short lever":{t:"Adductors",eq:"Bench",vid:"Copenhagen adduction short lever progression",
- do:["Support the bottom knee on the bench — that's the short lever","Lift the hips until the body is a straight line","Lead with the left","Progress to the long-lever (foot on bench) version only when 3×10 is easy"],
- dont:["Don't start with the long lever — adductor strains come from exactly that","Don't let the hips sag between reps","Don't hold your breath through the set"]},
-
-"Copenhagen adduction":{t:"Adductors",eq:"Bench",vid:"Copenhagen adduction long lever form",
- do:["Top foot on the bench, body in a straight line","Lift the bottom leg to meet the top leg","Lead with the left side","Regress to knee-supported if the groin complains at all"],
- dont:["Don't rotate the torso to make it easier","Don't push through groin pain — this is a prevention exercise, not a rehab one","Don't add reps faster than the adductors adapt"]},
-
-"Hanging leg raise":{t:"Core · hip flexors",eq:"Bar or straps",vid:"hanging leg raise form posterior pelvic tilt",
- do:["Start each rep by tilting the pelvis, not by lifting the legs","Control the descent — no swinging","Bend the knees if the straight-leg version breaks form"],
- dont:["Don't use momentum from a swing","Don't arch hard at the bottom","Don't let the shoulders go completely passive in the hang"]},
-
-"Bench press — barbell or machine":{t:"Chest · triceps · front delts",eq:"Barbell or machine",vid:"bench press form setup arch shoulder safe",
- do:["Set the shoulder blades down and back before you unrack","Elbows at roughly 45–60°, not flared to 90°","Touch the chest under control; drive back in a slight arc","Keep 2–3 reps in reserve — this is a strength lift, not a test"],
- dont:["Don't bounce the bar off the chest","Don't let the elbows flare wide — that's where shoulders get hurt","Don't lift the hips off the bench","Don't train to failure on a barbell without a spotter"]},
-
-"Chest-supported row":{t:"Mid-back · rhomboids · lats",eq:"Chest-supported row machine",vid:"chest supported row form mid back",
- do:["Pull with the elbows, not the hands","Squeeze the shoulder blades together at the end range","Let the shoulder blades travel forward on the stretch","Chest stays glued to the pad the whole set"],
- dont:["Don't heave the chest off the pad to move more weight","Don't shrug the traps up as you pull","Don't cut the stretch short at the bottom"]},
-
-"Incline DB press ~30°":{t:"Upper chest",eq:"Dumbbells + incline bench",vid:"incline dumbbell press 30 degree upper chest form",
- do:["Set the bench to about 30° — steeper turns it into a shoulder press","Lower until you feel a deep chest stretch","Keep the wrists stacked over the elbows","Press slightly inward at the top"],
- dont:["Don't set the incline at 45° or more","Don't clash the dumbbells together at the top","Don't let the elbows drop below a comfortable stretch"]},
-
-"Lat pulldown or pull-up":{t:"Lats",eq:"Pulldown or bar",vid:"lat pulldown form lats not biceps",
- do:["Start from a full overhead stretch, letting the shoulder blades rise","Drive the elbows down and slightly back toward the hip pockets","Slight backward torso lean, held constant","Control the way up — don't let it rip your arms straight"],
- dont:["Don't lean back and turn it into a row","Don't pull behind the neck","Don't use so much weight that you generate momentum with the hips"]},
-
-"Cable lateral raise":{t:"Side delts",eq:"Cable",vid:"cable lateral raise side delt form",
- do:["Cable set low, running across the body for tension at the bottom","Lead with the elbow, raise to about shoulder height","Slow lowering — the stretched position is where cables beat dumbbells","High reps, 0–1 RIR; this is a small muscle"],
- dont:["Don't shrug the traps up to finish the rep","Don't swing the torso to launch the arm","Don't go above shoulder height — the traps take over"]},
-
-"Leaning cable lateral raise":{t:"Side delts",eq:"Cable + upright",vid:"leaning cable lateral raise side delt stretch",
- do:["Hold the upright and lean away — this increases tension at the bottom","Keep a fixed slight elbow bend","Raise to shoulder height, lower over 2 seconds","Different enough from Upper A's version to avoid junk volume"],
- dont:["Don't let the lean change mid-set","Don't jerk out of the bottom","Don't chase weight — tension beats load here"]},
-
-"Overhead cable triceps extension":{t:"Triceps long head",eq:"Cable + rope",vid:"overhead cable triceps extension long head form",
- do:["Get the elbows genuinely overhead — that's what lengthens the long head","Keep the elbows narrow and pointed forward","Full stretch behind the head each rep","Expect to use less weight than a pushdown — that's fine and expected"],
- dont:["Don't let the elbows drift wide as you fatigue","Don't shorten the range to add load — the stretch is the whole reason this exercise is here","Don't let the torso pitch forward to help"]},
-
-"Incline DB curl":{t:"Biceps long head",eq:"Dumbbells + incline bench",vid:"incline dumbbell curl long head stretch form",
- do:["Bench at ~45–60°, let the arms hang fully behind the torso","Keep the upper arm still — only the forearm moves","Control the lowering into the stretch","Light weight is correct here; the position is the stimulus"],
- dont:["Don't let the elbows drift forward as you curl","Don't sit up to help the last reps","Don't cut the bottom range — that's the entire point of the incline"]},
-
-"Face pull + external rotation":{t:"Rear delts · rotator cuff",eq:"Cable + rope",vid:"face pull external rotation shoulder health form",
- do:["Cable set at roughly face height","Pull toward the forehead, finishing with the hands above the elbows","Externally rotate at the end — knuckles back","High reps, light load, 2 RIR"],
- dont:["Don't turn it into a heavy row","Don't let the elbows drop below the wrists","Don't shrug into the movement"]},
-
-"Wrist curl + reverse wrist curl":{t:"Forearms",eq:"Barbell, DBs or cable",vid:"wrist curl reverse wrist curl forearm training",
- do:["Forearms supported on a bench or thighs","Full range: let the bar roll to the fingertips on wrist curls","Reverse curls with a lighter load — extensors are weaker","High reps, controlled"],
- dont:["Don't use the same weight for both directions","Don't bounce at the end range","Don't ignore the reverse version — it's the one that protects the elbow"]},
-
-"Suitcase carry":{t:"Grip · core · traps",eq:"Dumbbell or KB",vid:"suitcase carry form anti lateral flexion",
- do:["One heavy weight, one side, walk tall","Resist the sideways lean — that's the core work","Shoulders level, ribs down","Switch sides each trip"],
- dont:["Don't let the torso tip toward the weight","Don't shrug the loaded side up","Don't shuffle — take normal walking steps"]},
-
-"Bulgarian split squat or walking lunge":{t:"Quads · glutes · single-leg control",eq:"DBs + bench",vid:"Bulgarian split squat form knee friendly setup",
- do:["Lead with the LEFT leg, then match the rep count on the right","Longer stride puts more on the glutes; shorter puts more on the quads","Control the descent — 3 seconds down","Front shin can travel forward if the knee stays under 3/10"],
- dont:["Don't let the front knee cave inward","Don't bounce the back knee off the floor","Don't let the strong side set the rep count","Don't add load while balance is still the limiting factor"]},
-
-"Hip thrust":{t:"Glute max",eq:"Barbell + bench",vid:"hip thrust form glute max setup",
- do:["Bench under the shoulder blades, chin tucked","Drive through the heels, finish with a hard glute squeeze","Ribs down — don't hyperextend the lower back at the top","Pause 1 second at lockout"],
- dont:["Don't arch the lower back to fake extra range","Don't let the knees drift out or in","Don't bounce off the floor between reps"]},
-
-"Seated leg curl":{t:"Hamstrings",eq:"Seated leg curl",vid:"seated leg curl hamstring long length form",
- do:["Seated beats lying here — it trains the hamstrings at longer length","Hips strapped down, torso upright","3 seconds on the lowering phase","Full range: let the knees straighten between reps"],
- dont:["Don't let the hips lift off the seat","Don't slam the weight stack on the return","Don't shorten the range to add plates"]},
-
-"Nordic hamstring eccentric":{t:"Hamstrings (eccentric)",eq:"Partner, pad or GHD",vid:"Nordic hamstring curl progression beginner",
- do:["Lower as slowly as you can control — 4 to 6 seconds","Keep the hips extended; body stays in a straight line","Catch yourself with the hands and push back up","Regress with a band or partial range if you can't control the last third"],
- dont:["Don't break at the hips — that halves the load and the benefit","Don't do these the day before a heavy lower session","Don't add reps quickly — this causes serious soreness","Don't attempt full range before you can control half"]},
-
-"Pallof press":{t:"Core (anti-rotation)",eq:"Cable or band",vid:"Pallof press anti rotation core form",
- do:["Stand side-on to the cable, press straight out from the sternum","Resist the rotation — nothing should twist","Brace the ribs down, breathe normally","Hold 1–2 seconds at full extension"],
- dont:["Don't let the torso rotate toward the stack","Don't hold your breath","Don't use so much weight that you lean away to counterbalance"]},
-
-"Overhead press":{t:"Front delts · triceps",eq:"Barbell or DBs",vid:"overhead press form standing seated shoulder",
- do:["Brace the core hard before each rep","Move the head back slightly, then through as the bar passes","Lock out with the bar over the mid-foot","Keep 2–3 in reserve"],
- dont:["Don't lean back into a standing incline press","Don't press around the face — clear a straight path","Don't let the ribs flare at lockout"]},
-
-"Weighted pull-up or neutral-grip pulldown":{t:"Lats",eq:"Bar or pulldown",vid:"weighted pull up form neutral grip",
- do:["Use a different grip from Upper A so the stimulus isn't a duplicate","Full hang at the bottom, chest to the bar at the top","Control the descent for 2 seconds","Add load only when you hit the top of the rep range clean"],
- dont:["Don't kip or swing","Don't stop halfway down to save the next rep","Don't shrug at the bottom of the hang"]},
-
-"Dip or decline press":{t:"Lower chest · triceps",eq:"Dip bars or bench",vid:"chest dip form shoulder safe depth",
- do:["Lean the torso forward to bias the chest","Descend until the upper arms are roughly parallel","Keep the shoulders down, away from the ears","Stop the range where the shoulder stays comfortable"],
- dont:["Don't drop into the bottom uncontrolled","Don't go so deep the shoulders round forward","Don't add weight while depth is still inconsistent"]},
-
-"Cable row — different handle to Upper A":{t:"Mid-back · lats",eq:"Cable row",vid:"cable row form back not biceps",
- do:["Change the handle and angle versus Upper A's row","Let the shoulder blades stretch forward at the front","Pull to the lower ribs, elbows close","Torso stays still — no rowing motion from the hips"],
- dont:["Don't rock back and forth","Don't shrug at the finish","Don't repeat the exact chest-supported row pattern — that's junk volume"]},
-
-"Shrug":{t:"Upper traps",eq:"Barbell or DBs",vid:"barbell shrug form upper trap",
- do:["Straight up and down — traps elevate, they don't rotate","Pause 1 second at the top","Full stretch at the bottom","Straps are fine; grip shouldn't be the limiter"],
- dont:["Don't roll the shoulders","Don't use momentum from the knees","Don't shorten the range with an ego load"]},
-
-"Reverse pec deck / rear-delt flye":{t:"Rear delts",eq:"Pec deck or cables",vid:"reverse pec deck rear delt form",
- do:["Lead with the elbows, arms nearly straight","Think 'spread the arms', not 'squeeze the blades'","High reps, 0–1 RIR","Slight forward lean of the torso"],
- dont:["Don't turn it into a row by bending the elbows","Don't jerk the weight out","Don't let the traps take over"]},
-
-"Preacher or cable curl":{t:"Biceps (short-mid length)",eq:"Preacher bench or cable",vid:"preacher curl form biceps",
- do:["Deliberately different length position from Upper A's incline curl","Armpits pressed into the pad","Control the lowering — this is where preacher curls bite","Stop just short of full elbow lockout at the bottom under heavy load"],
- dont:["Don't let the elbows lift off the pad","Don't bounce out of the bottom","Don't repeat the incline curl pattern here"]},
-
-"Hammer curl":{t:"Brachialis · brachioradialis",eq:"Dumbbells",vid:"hammer curl brachialis form",
- do:["Neutral grip throughout — thumbs up","Keep the elbows pinned to the sides","Control both directions","Cross-body variation is fine and slightly better for the brachialis"],
- dont:["Don't swing from the shoulders","Don't rotate into a supinated curl","Don't let the elbows travel forward"]},
-
-"Rope pushdown or skullcrusher":{t:"Triceps lateral · medial heads",eq:"Cable or EZ bar",vid:"triceps rope pushdown form lateral head",
- do:["Elbows pinned to the sides, only the forearms move","Spread the rope apart at the bottom","Full lockout, then control back up","This complements the overhead angle — both are needed"],
- dont:["Don't lean over the cable and turn it into a press","Don't let the elbows drift forward or flare","Don't use so much weight the shoulders join in"]},
-
-"External rotation — cable or band":{t:"Rotator cuff",eq:"Cable or band",vid:"cable external rotation rotator cuff form",
- do:["Elbow tucked at the side, bent 90°","Rotate the forearm outward, slow and controlled","Very light load, 2 RIR, high reps","A rolled towel under the elbow helps keep position"],
- dont:["Don't let the elbow drift away from the ribs","Don't extend the shoulder backward to cheat range","Don't load this heavily — it's joint health work"]},
-
-"Neck flexion / extension":{t:"Neck",eq:"Harness or manual",vid:"neck training flexion extension safe beginner",
- do:["Only include this if contact-sport or athletic goals apply","Very slow, controlled range in both directions","Start with manual resistance before any harness load","High reps, low load"],
- dont:["Don't load the neck aggressively or quickly","Don't train through any neck or headache symptoms","Don't include it at all if it isn't serving a goal"]}
-};
-CUES["Seated calf raise — bent knee "] = CUES["Seated calf raise — bent knee"];
-
-/* ============================================================
-   FACT CHECK — every claim re-verified against primary sources
-   v: s=supported  p=partial  c=contradicted  u=untested/weak
-   ============================================================ */
 const FACTS = [
  {c:"TRT shortens the MPS window / justifies higher frequency", v:"c", l:"Contradicted",
   f:"No evidence. Volume and ~2×/week frequency still govern hypertrophy. TRT raises the ceiling, not the rules."},
@@ -1109,6 +641,7 @@ const FACTS = [
   f:"Survey-derived (Rogerson 2024: athletes deload every 5.6 ± 2.3 weeks). Coleman 2024 (PeerJ 12:e16777) found a one-week deload produced <b>no</b> hypertrophy benefit. Justify deloads here by tendon and joint management — which is honest and sufficient."}
 ];
 
+
 const CITES = [
  "<b>Pelland JC, Remmert JF, Robinson ZP, Hinson SR, Zourdos MC.</b> The Resistance Training Dose Response. Sports Med. 2026 Feb;56(2):481–505. doi:10.1007/s40279-025-02344-w. PMID 41343037",
  "<b>Remmert JF, et al.</b> Is There Too Much of a Good Thing? Per-session volume meta-regressions. SportRxiv preprint, 2025. [not peer-reviewed]",
@@ -1144,32 +677,574 @@ const CITES = [
  "<b>Mulhall JP, et al.</b> AUA guideline: evaluation and management of testosterone deficiency. J Urol. 2018;200(2):423–432. PMID 29601923"
 ];
 
-const PROG = [
- {w:"1–3", p:"Accumulation", s:"Base volume as written. Establish loads. Learn the 3s/3s tempo before chasing weight on it.", t:"~15RM on hack squat and leg extension. Establish 24-hour tolerance before adding anything.", r:"2–3"},
- {w:"4–6", p:"Progression", s:"Add 1–2 sets to priority muscles. Tighten isolation to 1 RIR. Double progression on compounds.", t:"~12RM → ~10RM. Advance only if the 24-h rule held for two consecutive sessions.", r:"1–3"},
- {w:"7", p:"Deload", s:"Volume cut ~40–50%, keep load and patterns, RIR 3–4.", t:"Hold load, cut to 2 sets per movement, keep the tempo.", r:"3–4"},
- {w:"8–10", p:"Intensification", s:"Compounds to 4–6 reps. Peak volume — priority muscles at the top of their band.", t:"~8RM. This is where 3s/3s starts to feel genuinely heavy.", r:"1–2"},
- {w:"11–12", p:"Peak", s:"Highest intensity, volume held or slightly reduced. Week 12 tapers into the next deload.", t:"~6RM. Endpoint of the Kongsgaard progression.", r:"1–2"}
-];
 
-const THRESH = [
- ["Knee pain >3/10 during loading, or not settled within 24 h","Drop tendon load one tier next session. Hold progression.","halt"],
- ["Two consecutive 24-hour flares","Hold the tier two weeks. Get physiotherapist review.","halt"],
- ["Knee pain at rest above 3/10","Swap Saturday's 4×4 for Zone 2. Reassess Lower A.","halt"],
- ["Rising hematocrit, or approaching the intervention threshold","<b>Pause the 4×4. Contact your prescriber.</b> Zone 2 only until resolved.","halt"],
- ["Rising blood pressure","Pause the 4×4, consult, continue lifting at reduced intensity pending advice.","halt"],
- ["Stalled lifts plus poor sleep, or resting HR up ≥7 bpm","Deload early. Do not wait for week 7.","load"],
- ["Aerobic threshold test stalled twice running","Recovery budget is spent. Cut accessory volume a third for two weeks, or take an extra rest day.","load"],
- ["Session time consistently over 90 min","Cut optional items first: neck, carries, Spanish squat, one lateral-raise set. Never cut HSR or the compounds.","load"],
- ["Single-leg press ≥150% BW pain-free both legs + SLDS ≤2/10 + 4 clear weeks","Unlock plyometric and energy-storage loading on Lower A.","ok"],
- ["Explosive or athletic performance becomes a priority","Add dedicated power work — the one goal where interference genuinely bites. Keep the 4×4 ≥48 h from power sessions.","load"]
+const yt = q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+const $  = s => document.querySelector(s);
+let state = { age:39, hrmax:null };
+
+/* ============================================================
+   THE CYCLE — six slots, run in order, rest between any of them
+   ============================================================ */
+const CYCLE = [
+ {id:"lowerA", n:"01", kind:"Resistance", name:"Lower A",
+  fx:"Quads, knee, and the primary tendon load", tendon:true},
+ {id:"upperA", n:"02", kind:"Resistance", name:"Upper A",
+  fx:"Horizontal push and pull, arms, forearms"},
+ {id:"zone2",  n:"03", kind:"Conditioning", name:"Zone 2",
+  fx:"Standalone aerobic work at the lowest recovery cost", aero:true},
+ {id:"lowerB", n:"04", kind:"Resistance", name:"Lower B",
+  fx:"Hips, hamstrings, and the second tendon dose", tendon:true},
+ {id:"upperB", n:"05", kind:"Resistance", name:"Upper B",
+  fx:"Vertical push and pull, arms, forearms"},
+ {id:"vo2",    n:"06", kind:"Conditioning", name:"VO₂max — 4×4",
+  fx:"Intervals. Swap in Zone 2 any time you choose", aero:true}
 ];
 
 /* ============================================================
-   VOLUME — computed from the sessions above, not asserted
+   BEFORE YOU START
+   ============================================================ */
+const PREP = {
+ lowerA:[
+  ["Collagen + vitamin C, 30–60 min before","15 g collagen or gelatin with about 50 mg vitamin C. Take it before you leave the house, not when you arrive — the window is the point. This is a tendon day."],
+  ["Creatine, 5 g","Timing does not matter. Just do not skip it."],
+  ["Check the knee first","If yesterday's morning decline squat was above 3/10, or last session's soreness has not settled, run today's tendon work one load tier lighter. That decision is made before you start, not mid-set."],
+  ["Set up for the hack squat before anything else","Know the load you are starting at. Guessing under the bar leads to grinding, and grinding is where breath-holding starts."]
+ ],
+ upperA:[
+  ["Creatine, 5 g","Daily, any time."],
+  ["No collagen needed today","There is no tendon-loading work in this session. Save it for the lower days."],
+  ["Know your top set before you start","Decide the bench weight in advance. Deciding under load is how sessions turn into grinds."]
+ ],
+ lowerB:[
+  ["Collagen + vitamin C, 30–60 min before","Same as Lower A — the leg extension carries the second weekly tendon dose."],
+  ["Creatine, 5 g",""],
+  ["Check the knee first","Same rule. Above 3/10 or unsettled from last session means one tier lighter today."],
+  ["Nordics come after the leg curls","Do not do these first. They cause serious soreness and will wreck the rest of the session."]
+ ],
+ upperB:[
+  ["Creatine, 5 g",""],
+  ["Set the seat and back pad first","The overhead press is seated and supported now. Get the pad upright and your back flat against it before you load anything."],
+  ["Shrugs are light today","Pick a moderate dumbbell. This is deliberately no longer a heavy movement."]
+ ],
+ zone2:[
+  ["Nothing to take, nothing to prepare","No collagen, no pre-workout. This session works by being cheap."],
+  ["Pick one machine and stay with it","Bike, rower, or incline walk. Keeping the modality constant is what makes the threshold test comparable later."],
+  ["Water and a way to see your heart rate","Watch, chest strap, or machine handles. Without it you will drift too hard — everyone does."]
+ ],
+ vo2:[
+  ["Confirm you are cleared for maximal-heart-rate work","This is not a formality on TRT, and it is not a formality with unexplained neurological symptoms. If you have not been cleared since the mouth and finger episode, run Zone 2 instead today."],
+  ["Check your resting heart rate","Up 7 bpm or more on your normal? Run Zone 2 instead. That is not weakness, that is the protocol working."],
+  ["Bike or rower, not running","Same cardiac stimulus, a fraction of the tendon load."],
+  ["Know your target numbers before you start","Scrolling for them mid-interval never works."]
+ ]
+};
+
+/* ============================================================
+   WARM-UP — now includes cervical and breathing work
+   ============================================================ */
+const WU_LIFT = [
+ ["General warm-up","5 min easy bike or rower. Enough to break a light sweat. This is not aerobic training and does not count toward your Zone 2 volume.","5 min"],
+ ["Breathing and bracing drill","Six slow breaths lying on your back, hand on the belly. Then practise bracing the trunk hard <b>while still exhaling</b>. This is the single most important addition to your warm-up — it teaches you to create trunk stiffness without holding your breath, which is what spikes pressure in the head and neck.","2 min"],
+ ["Cervical mobility and release","Ten slow chin nods, ten gentle rotations each way, then 30 s each side on the upper trap and scalene stretch (ear toward shoulder, opposite hand tucked under the thigh). Slow and gentle — no cranking, no end-range holds.","3 min"],
+ ["Dynamic mobility","Hips (90/90, hip airplanes), <b>ankles (weighted dorsiflexion)</b>, t-spine rotations, band shoulder dislocates.","4 min"],
+ ["Movement-specific ramp","Two to three progressively heavier sets of the first compound, finishing one set below your working weight. Never jump straight to a working set.","3–5 min"]
+];
+const WU_LOWER_EXTRA = ["Spanish squat isometric (optional)","5 × 45 s at about 70% effort. Doubles as a warm-up and a pain-modulation tool. If it leaves your quads tired rather than primed, move it to the end of the session or drop it — the evidence for it is thin either way.","6 min"];
+
+const WU = {
+ zone2:[
+  ["Easy build","First 5 minutes of the session are the warm-up. Start below your target range and drift up into it.","5 min"],
+  ["Cervical mobility","Same chin nods, rotations and upper trap stretch as a lifting day. Two minutes. Cheap insurance.","2 min"]
+ ],
+ vo2:[
+  ["Progressive warm-up","Ten full minutes, building gradually. Finish the last two minutes at roughly your recovery-block pace. Do not shortcut this — going into interval one cold is how you fail interval four.","10 min"],
+  ["Cervical mobility","Chin nods, rotations, upper trap stretch before you start.","2 min"],
+  ["Two 30-second surges","During the last three minutes of the warm-up, lift to near interval pace twice, 30 s each. This wakes up the system so interval one is not a shock.","1 min"]
+ ]
+};
+
+/* ============================================================
+   COOL-DOWN
+   ============================================================ */
+const CD = {
+ lift:[
+  ["Easy spin or walk","Three to five minutes. Brings the heart rate down and stops the post-session light-headedness that comes with heavy sets.","3–5 min"],
+  ["Neck decompression","Lie on your back, gentle chin tuck, 30 s. Then a doorway pec stretch, 30 s each side. Tight pecs pull the shoulders forward and load the neck.","2 min"],
+  ["Nothing else is required","No long static stretching, no foam-rolling ritual. Neither changes your outcomes here. Go home and eat.",""]
+ ],
+ cond:[
+  ["Five minutes easy","Do not stop dead at the end of the last interval. Spin it out.","5 min"],
+  ["Stand up slowly","Especially relevant on TRT with raised haematocrit. Give yourself a moment before walking off.",""]
+ ]
+};
+
+/* ============================================================
+   STOP RULES
+   ============================================================ */
+const NEURO_STOP = [
+ "Numbness or tingling spreading to your face, tongue, or down an arm",
+ "Any drooping of the face, an uneven smile, or a sagging eyelid",
+ "Slurred speech, trouble finding words, or difficulty swallowing",
+ "Sudden weakness in an arm or leg, or loss of balance",
+ "Sudden severe headache unlike your usual",
+ "Any change in vision"
+];
+const SESSION_STOP = {
+ lift:[
+  "New tingling in a hand or the face during a set — rack the weight, end the session",
+  "Neck pain that travels down the arm",
+  "Knee pain above 3/10 during a movement — drop the load, do not push through",
+  "You cannot complete a rep without holding your breath — the load is too heavy today",
+  "The 3s/3s tempo breaks on a tendon movement — that set is over"
+ ],
+ zone2:[
+  "Heart rate will not settle into range at an easy effort — stop and take the day off",
+  "Any tingling in the face or hand",
+  "Knee pain rising above 3/10 during the session"
+ ],
+ vo2:[
+  "Any tingling, facial symptoms or visual change — stop immediately, do not finish the set",
+  "Chest tightness, unusual shortness of breath, or palpitations",
+  "You cannot reach your target heart rate despite maximum effort — a sign of accumulated fatigue, end the session",
+  "Light-headedness during or after an interval"
+ ]
+};
+
+/* ============================================================
+   HOW HARD — condition-based, no week numbers
+   ============================================================ */
+const HARDER = [
+ "You hit the top of the rep range on <b>every</b> set at the target RIR",
+ "The tempo held on the last rep of the last set",
+ "The knee settled within 24 hours after the previous lower session",
+ "No tingling, numbness or facial symptoms in the last two sessions",
+ "You slept 7 hours or more"
+];
+const LIGHTER = [
+ "Knee pain above 3/10, or not settled within 24 hours — drop the tendon load one tier",
+ "Any neurological symptom during or after the last session — reduce load 20% and remove anything overhead",
+ "Sleep under 6 hours, or two poor nights running — same loads, fewer sets",
+ "Resting heart rate up 7 bpm or more — run Zone 2 instead of the 4×4",
+ "You stalled at the same load twice in a row — cut volume roughly in half for one cycle, keep the load, raise RIR to 3–4",
+ "Joint or tendon soreness climbing across cycles — that is the signal for a lighter cycle, and it is the main reason you would take one"
+];
+
+/* ============================================================
+   HEART RATE
+   ============================================================ */
+function hrmax(){ return state.hrmax || (220 - (state.age||39)); }
+function hrBox(kind){
+  const m=hrmax(), z2=[Math.round(m*.60),Math.round(m*.70)],
+        hi=[Math.round(m*.90),Math.round(m*.95)], rec=Math.round(m*.70);
+  return `<div class="hrbox">
+    <div class="tool-name" style="margin-bottom:8px">${kind==='z2'?'Your Zone 2 window':'Your interval targets'}</div>
+    ${kind==='z2'
+      ? `<div class="hrbig" style="color:var(--aero)">${z2[0]}–${z2[1]} bpm</div>
+         <div class="hrsub">60–70% of an estimated max of ${m}. Drift above this and the day stops being cheap.</div>`
+      : `<div class="hrbig" style="color:var(--aero)">${hi[0]}–${hi[1]} bpm</div>
+         <div class="hrsub">Work intervals at 90–95% of an estimated max of ${m}. Recovery blocks around ${rec} bpm.</div>`}
+    <div class="hrin"><input type="number" value="${state.age||39}" min="18" max="90" onchange="setAge(this.value)">
+      <label>Age, for the 220−age estimate. Rough by design — a measured max is better.</label></div>
+    <div class="hrin"><input type="number" value="${state.hrmax||''}" placeholder="—" min="120" max="220" onchange="setHrmax(this.value)">
+      <label>Measured HRmax if you have one. Overrides the estimate.</label></div>
+  </div>`;
+}
+function setAge(v){ state.age=+v||39; openSession(curSlot); }
+function setHrmax(v){ state.hrmax=v?+v:null; openSession(curSlot); }
+
+/* ============================================================
+   RENDER — cycle list
+   ============================================================ */
+function setCount(id){
+  const s=S[id]; if(!s) return null;
+  return s.ex.reduce((a,e)=>a+(e.opt?0:e.sets),0);
+}
+function renderCycle(){
+  $("#v-cycle").innerHTML = `
+  <div class="med">
+    <div class="nt">Before your next session</div>
+    <p>Two neurological episodes now, months apart — the four-month leg numbness and last week's mouth-and-finger event. That pattern needs a doctor, not form coaching. Ask for a <strong>haematocrit, blood pressure, and a neurological exam</strong>, and mention the leg episode.</p>
+    <p style="margin-bottom:0"><a href="#" onclick="setView('nerve');return false" style="color:var(--halt);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase">Full detail and what changed →</a></p>
+  </div>
+
+  <h2>Run these in order</h2>
+  <p class="small">No weekdays. Finish a slot, take a rest day whenever you want, then start the next one. Because rest only ever pushes the cycle further apart, you cannot break the recovery spacing by resting — spacing only ever gets longer, never shorter.</p>
+
+  <div class="spine">
+    ${CYCLE.map(c=>{
+      const n=setCount(c.id), s=S[c.id]||COND[c.id];
+      const meta = S[c.id]
+        ? [`${n} working sets`, "RIR 1–3", c.tendon?"HSR 3s / 3s":"double progression"]
+        : (c.id==="zone2" ? ["45–60 min", `${Math.round(hrmax()*.60)}–${Math.round(hrmax()*.70)} bpm`, "RPE 3–4"]
+                          : ["~38 min", `${Math.round(hrmax()*.90)}–${Math.round(hrmax()*.95)} bpm`, "or swap Zone 2"]);
+      return `<div class="slot ${c.aero?'aero':'load'}" onclick="openSession('${c.id}')">
+        <div class="node">${c.n}</div>
+        <div class="body">
+          <div class="kind">${c.kind}</div>
+          <h3>${c.name}</h3>
+          <div class="fx">${c.fx}</div>
+          <div class="meta">${meta.map(m=>`<span>${m}</span>`).join("")}</div>
+          <span class="go">Open session →</span>
+        </div></div>`;
+    }).join("")}
+    <div class="cyc-end"><div class="node">↻</div>
+      <p>Then back to 01. Aim to close a cycle in <strong>6 to 8 days</strong> — stretch it much past that and every muscle drops below twice a week, and the volume this plan is built on stops being true.</p></div>
+  </div>
+
+  <h2>Why this order</h2>
+  <div class="card"><table class="tbl">
+    <tr><td class="m" style="color:var(--load)">72 h</td><td>Between Lower A and Lower B, and between Upper A and Upper B, if you run the slots back to back.</td></tr>
+    <tr><td class="m" style="color:var(--aero)">Slot 03</td><td>Zone 2 sits between the two lower days as active recovery.</td></tr>
+    <tr><td class="m" style="color:var(--aero)">Slot 06</td><td>Intervals land two slots after the last heavy lower day, and immediately before Lower A comes round again.</td></tr>
+    <tr><td class="m" style="color:var(--halt)">Never</td><td>Lifting and conditioning on the same day. That separation is the single highest-leverage decision in this plan.</td></tr>
+  </table></div>
+  <p class="small">Interference from combining lifting and cardio is small in the pooled data, but it concentrates in exactly your profile — lower-body maximal strength in trained males (SMD −0.43), and mostly when the two are done in the same session. Keeping them on separate days removes the condition where the effect appears.</p>`;
+}
+
+/* ============================================================
+   RENDER — a session
+   ============================================================ */
+let curSlot = null;
+function exHTML(e,i){
+  const c = CUES[e.n];
+  return `<div class="ex ${e.hsr?'hsr':''} ${e.neck?'neck':''} ${e.opt?'opt':''}">
+    <div class="ex-h" onclick="this.parentNode.classList.toggle('open')">
+      <span class="ex-n">${String(i+1).padStart(2,'0')}</span>
+      <div class="ex-b">
+        <div class="ex-name">${e.n}${e.left?' <span style="color:var(--tendon);font-size:11px">◂ left first</span>':''}</div>
+        <div class="ex-dose">${e.dose}${e.hsr?'  ·  tendon':''}${e.opt?'  ·  optional':''}${e.neck?'  ·  modified':''}</div>
+      </div><span class="ex-car">›</span>
+    </div>
+    <div class="ex-d">
+      <div class="spec">
+        <div><div class="k">RIR</div><div class="v">${e.rir}</div></div>
+        <div><div class="k">Rest</div><div class="v">${e.rest}</div></div>
+        <div><div class="k">Tempo</div><div class="v">${e.tempo}</div></div>
+      </div>
+      ${c?`<div class="pills"><span class="pill">${c.t}</span><span class="pill">${c.eq}</span>${
+        e.hsr?'<span class="pill hl">Tendon track</span>':''}${
+        e.neck?'<span class="pill warn">Cervical precaution</span>':''}</div>`:""}
+      <div class="why">${e.why}</div>
+      ${c?`<div class="dd">
+        <div class="do"><h5>Do</h5>${c.do.map(x=>`<div class="it">${x}</div>`).join("")}</div>
+        <div class="dont"><h5>Don't</h5>${c.dont.map(x=>`<div class="it">${x}</div>`).join("")}</div>
+      </div>`:""}
+      ${c?`<a class="vid" href="${yt(c.vid)}" target="_blank" rel="noopener">▶ Form video — ${e.n.split(" — ")[0]}</a>`:""}
+    </div></div>`;
+}
+function steps(arr){
+  return `<div class="card steps">${arr.map((s,i)=>`<div class="s">
+    <div class="num">${String(i+1).padStart(2,'0')}</div>
+    <div class="tx"><div class="tt">${s[0]}</div>${s[1]?`<div class="td">${s[1]}</div>`:""}${s[2]?`<div class="tm">${s[2]}</div>`:""}</div>
+  </div>`).join("")}</div>`;
+}
+function stopBlock(kind){
+  return `<div class="note halt"><div class="nt">Stop the session and get medical help now if</div>
+    ${NEURO_STOP.map(x=>`<p>— ${x}</p>`).join("")}</div>
+  <div class="note load"><div class="nt">Stop the set, end the session if</div>
+    ${SESSION_STOP[kind].map(x=>`<p>— ${x}</p>`).join("")}</div>`;
+}
+function hardBlock(){
+  return `<h2>How hard, today</h2>
+  <div class="note ok"><div class="nt">Add load only when all of these are true</div>
+    ${HARDER.map(x=>`<p>— ${x}</p>`).join("")}</div>
+  <div class="note load"><div class="nt">Back off when any of these are true</div>
+    ${LIGHTER.map(x=>`<p>— ${x}</p>`).join("")}</div>
+  <p class="small">There are no week numbers in this plan. Load moves when the conditions above are met and not before. On the tendon movements that means starting at a weight you can control for about 15 reps at 3s/3s and letting it drift toward 6 over the months as the conditions keep clearing. Rushing that is the one mistake that costs you the whole block.</p>`;
+}
+function nextSlot(id){
+  const i = CYCLE.findIndex(c=>c.id===id);
+  return CYCLE[(i+1)%CYCLE.length];
+}
+
+function openSession(id){
+  curSlot = id;
+  const c = CYCLE.find(x=>x.id===id);
+  const nx = nextSlot(id);
+  const lift = !!S[id];
+  const ses = S[id]||COND[id];
+  let html = `<button class="back" onclick="renderCycle();window.scrollTo(0,0)">← All six slots</button>
+    <div class="shead ${lift?'':'aero'}">
+      <div class="n">Slot ${c.n} · ${c.kind}</div>
+      <h2>${c.name}</h2><div class="t">${ses.tag}</div>
+    </div>`;
+
+  html += `<h2>Before you start</h2>${steps(PREP[id])}`;
+
+  if(lift){
+    const wu = id.startsWith("lower") ? WU_LIFT.slice(0,4).concat([WU_LOWER_EXTRA, WU_LIFT[4]]) : WU_LIFT;
+    html += `<h2>Warm-up</h2>${steps(wu)}
+      <a class="vid sm" href="${yt('cervical mobility chin nod upper trap scalene stretch routine')}" target="_blank" rel="noopener">▶ Neck mobility routine</a>
+      <a class="vid sm" href="${yt('brace core without holding breath exhale on effort lifting')}" target="_blank" rel="noopener">▶ Bracing without breath-holding</a>
+      <div class="note halt"><div class="nt">The breathing rule, every set</div>
+        <p><strong>Exhale on the effort. Never hold your breath under load.</strong> Breath-holding spikes pressure in the chest and head, and that is the mechanism most likely behind the simultaneous mouth and finger episode. If a rep cannot be completed while breathing out, the weight is too heavy today.</p></div>
+
+      <h2>Session</h2>
+      <div class="note load"><div class="nt">${ses.name}</div><p>${ses.head}</p></div>
+      ${ses.ex.map((e,i)=>exHTML(e,i)).join("")}`;
+
+    if(ses.ex.some(e=>e.hsr)) html += tempoTool();
+    if(ses.ex.some(e=>e.opt))  html += holdTool();
+    html += restTool();
+    html += hardBlock();
+    html += `<h2>Stop rules</h2>${stopBlock("lift")}`;
+    if(id.startsWith("lower")) html += `<div class="note tendon"><div class="nt">The 24-hour rule</div>
+      <p>Pain up to 3/10 while loading is acceptable — tendon rehab is not meant to be pain-free. What matters is that it returns to baseline within 24 hours. Test it the next morning with a single-leg decline squat, same setup, same time of day. Above 3/10, or not settled, means one tier lighter next time. This rule outranks everything else in the plan.</p></div>`;
+    html += `<h2>Cool-down</h2>${steps(CD.lift)}`;
+
+  } else if(id==="zone2"){
+    html += `<h2>Warm-up</h2>${steps(WU.zone2)}
+      <h2>Your numbers</h2>${hrBox('z2')}
+      <h2>The session</h2>
+      <div class="card"><table class="tbl">${ses.spec.map(s=>`<tr><td class="m" style="color:var(--aero)">${s[1]}</td><td>${s[0]}</td></tr>`).join("")}</table>
+      <a class="vid sm" href="${yt('zone 2 training how to find intensity talk test')}" target="_blank" rel="noopener">▶ Finding your Zone 2 intensity</a></div>
+      <div class="note aero"><div class="nt">The talk test</div><p>${ses.talk}</p></div>
+      <div class="card"><div class="dd" style="margin-top:0">
+        <div class="do"><h5>Do</h5>
+          <div class="it">Stay on one machine so the effort stays comparable session to session</div>
+          <div class="it">Hold a steady output — no surges</div>
+          <div class="it">Treat it as active recovery between the two lower slots</div>
+          <div class="it">Use it in place of the 4×4 any time you want. That is a built-in option, not a compromise</div></div>
+        <div class="dont"><h5>Don't</h5>
+          <div class="it">Don't let it creep into tempo — the most common error by far</div>
+          <div class="it">Don't run while the tendon is symptomatic</div>
+          <div class="it">Don't add "just a few sets" of lifting to this day</div>
+          <div class="it">Don't skip it thinking intervals replaced it — they cost far more recovery</div></div>
+      </div></div>
+      <div class="note halt"><div class="nt">What this day is not for</div><p>${ses.notPurpose}</p></div>
+      ${restTool()}
+      <h2>Stop rules</h2>${stopBlock("zone2")}
+      <h2>Cool-down</h2>${steps(CD.cond)}`;
+
+  } else {
+    html += `<div class="note halt"><div class="nt">Clearance comes first</div>
+        <p>Maximal-heart-rate intervals stack three cardiovascular stressors on you at once: TRT-driven haematocrit, heavy lifting, and near-max cardiac output. With unexplained neurological symptoms in the last week, that needs a doctor's yes before you run it — not a judgement call in the gym.</p>
+        <p><strong>Until then, run Zone 2 in this slot.</strong> You lose very little; the aerobic base still builds, and the recovery cost is lower.</p></div>
+      <h2>Warm-up</h2>${steps(WU.vo2)}
+      <h2>Your numbers</h2>${hrBox('hi')}
+      <h2>The session · ~38 min</h2>
+      <div class="scroll"><table class="tbl"><tr><th>Phase</th><th>Time</th><th>Intensity</th></tr>
+        ${ses.phases.map(p=>`<tr><td>${p[0]}</td><td class="m" style="color:var(--aero)">${p[1]}</td><td class="m">${p[2]}</td></tr>`).join("")}
+      </table></div>
+      ${intervalTool()}
+      <div class="card"><div class="dd" style="margin-top:0">
+        <div class="do"><h5>Do</h5>
+          <div class="it">Build into interval one — heart rate lags by roughly two minutes</div>
+          <div class="it">Keep moving through the recovery blocks rather than stopping dead</div>
+          <div class="it">Finish interval four at the same output as interval one</div>
+          <div class="it">Breathe freely throughout — no breath-holding on the hard blocks</div></div>
+        <div class="dont"><h5>Don't</h5>
+          <div class="it">Don't sprint the first minute; this is a four-minute effort</div>
+          <div class="it">Don't run it while the tendon is symptomatic — bike or row</div>
+          <div class="it">Don't run it on poor sleep or a raised resting heart rate</div>
+          <div class="it">Don't run it if your haematocrit or blood pressure is trending up</div></div>
+      </div>
+      <a class="vid sm" href="${yt('Norwegian 4x4 interval training protocol how to')}" target="_blank" rel="noopener">▶ How to run the Norwegian 4×4</a></div>
+      <div class="note aero"><div class="nt">Pacing</div><p>${ses.pacing}</p></div>
+      <div class="note aero"><div class="nt">Swap in Zone 2 whenever</div>${ses.swap.map(s=>`<p>— ${s}</p>`).join("")}</div>
+      <h2>Stop rules</h2>${stopBlock("vo2")}
+      <h2>Cool-down</h2>${steps(CD.cond)}`;
+  }
+
+  html += `<h2>Next in the cycle</h2>
+    <div class="slot ${nx.aero?'aero':'load'}" style="margin-left:0" onclick="openSession('${nx.id}');window.scrollTo(0,0)">
+      <div class="body"><div class="kind">Slot ${nx.n} · ${nx.kind}</div><h3>${nx.name}</h3>
+      <div class="fx">${nx.fx}</div><span class="go">Open →</span></div></div>
+    <p class="small">Rest first if you need to. The order holds; the calendar does not.</p>`;
+
+  $("#v-cycle").innerHTML = html;
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on", b.dataset.v==="cycle"));
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
+  $("#v-cycle").classList.add("on");
+  window.scrollTo(0,0);
+}
+
+/* ============================================================
+   TIMERS
+   ============================================================ */
+function tempoTool(){return `<div class="tool">
+  <div class="tool-top"><span class="tool-name">Tempo pacer · 3 s / 3 s</span><span class="tool-hint">tendon movements</span></div>
+  <div class="pacer" id="pc"><i id="pcb"></i><span id="pct">Ready</span></div>
+  <div class="btns"><button class="b go tendon" id="pcgo" onclick="togglePacer()">Start</button></div>
+  <p class="small" style="margin:11px 0 0">Three seconds up, three seconds down. Load the bar so the last rep still holds the tempo — if the tempo breaks, the set ended two reps ago.</p></div>`;}
+function holdTool(){return `<div class="tool">
+  <div class="tool-top"><span class="tool-name">Isometric hold · 5 × 45 s</span><span class="tool-hint">Spanish squat, optional</span></div>
+  <div class="readout" id="hdR">45</div><div class="phase" id="hdP">Set 1 of 5 · ready</div>
+  <div class="bar"><i class="tendon" id="hdB"></i></div>
+  <div class="btns"><button class="b go tendon" id="hdgo" onclick="toggleTimer('hd')">Start</button><button class="b" onclick="resetTimer('hd')">Reset</button></div></div>`;}
+function intervalTool(){return `<div class="tool">
+  <div class="tool-top"><span class="tool-name">4×4 interval timer</span><span class="tool-hint">~38 min total</span></div>
+  <div class="readout" id="ivR">10:00</div><div class="phase" id="ivP">Warm-up · ready</div>
+  <div class="bar"><i class="aero" id="ivB"></i></div>
+  <div class="btns"><button class="b go aero" id="ivgo" onclick="toggleTimer('iv')">Start</button><button class="b" onclick="resetTimer('iv')">Reset</button></div></div>`;}
+function restTool(){return `<div class="tool">
+  <div class="tool-top"><span class="tool-name">Rest timer</span><span class="tool-hint">tap to set</span></div>
+  <div class="readout" id="rsR">3:00</div><div class="phase" id="rsP">ready</div>
+  <div class="bar"><i id="rsB"></i></div>
+  <div class="btns" style="margin-bottom:7px">
+    <button class="b" onclick="setRest(60)">60 s</button><button class="b" onclick="setRest(90)">90 s</button>
+    <button class="b" onclick="setRest(120)">2 min</button><button class="b" onclick="setRest(180)">3 min</button>
+    <button class="b" onclick="setRest(300)">5 min</button></div>
+  <div class="btns"><button class="b go" id="rsgo" onclick="toggleTimer('rs')">Start</button><button class="b" onclick="resetTimer('rs')">Reset</button></div></div>`;}
+
+const IV_PHASES=[["Warm-up",600],["Interval 1",240],["Recovery",180],["Interval 2",240],["Recovery",180],["Interval 3",240],["Recovery",180],["Interval 4",240],["Cool-down",300]];
+const HD_PHASES=[["Hold 1",45],["Rest",120],["Hold 2",45],["Rest",120],["Hold 3",45],["Rest",120],["Hold 4",45],["Rest",120],["Hold 5",45]];
+const T={ iv:{ph:IV_PHASES,i:0,left:600,on:false,r:"ivR",p:"ivP",b:"ivB",g:"ivgo"},
+          hd:{ph:HD_PHASES,i:0,left:45,on:false,r:"hdR",p:"hdP",b:"hdB",g:"hdgo"},
+          rs:{ph:[["Rest",180]],i:0,left:180,on:false,r:"rsR",p:"rsP",b:"rsB",g:"rsgo"} };
+function fmt(s){const m=Math.floor(s/60),x=Math.floor(s%60);return m>0?m+":"+String(x).padStart(2,"0"):String(x);}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+function paint(k){
+  const t=T[k], r=document.getElementById(t.r); if(!r) return;
+  const [nm,dur]=t.ph[t.i];
+  r.textContent=fmt(Math.ceil(t.left));
+  document.getElementById(t.p).textContent = k==="hd" ? `${nm} · ${Math.floor(t.i/2)+1} of 5`
+    : (t.ph.length>1 ? `${nm} · ${t.i+1} of ${t.ph.length}` : nm);
+  document.getElementById(t.b).style.width = ((dur-t.left)/dur*100)+"%";
+  const g=document.getElementById(t.g); if(g) g.textContent = t.on?"Pause":"Start";
+}
+function toggleTimer(k){ T[k].on=!T[k].on; paint(k); }
+function resetTimer(k){ const t=T[k]; t.on=false; t.i=0; t.left=t.ph[0][1]; paint(k); }
+function setRest(s){ T.rs.ph=[["Rest",s]]; resetTimer("rs"); }
+const PC={on:false,t:0,half:-1};
+function togglePacer(){ PC.on=!PC.on; if(PC.on){PC.t=0;PC.half=-1;}
+  const g=document.getElementById("pcgo"); if(g) g.textContent=PC.on?"Stop":"Start";
+  if(!PC.on){const l=document.getElementById("pct"); if(l) l.textContent="Ready";} }
+let last=performance.now();
+function loop(now){
+  const dt=(now-last)/1000; last=now;
+  Object.keys(T).forEach(k=>{ const t=T[k]; if(!t.on) return;
+    if(!document.getElementById(t.r)) return;
+    t.left-=dt;
+    if(t.left<=0){ if(t.i<t.ph.length-1){ t.i++; t.left=t.ph[t.i][1]; buzz([90,60,90]); }
+                   else { t.on=false; t.left=0; buzz([200,80,200,80,200]); } }
+    paint(k); });
+  if(PC.on){ PC.t+=dt; const cyc=PC.t%6, up=cyc<3;
+    const bar=document.getElementById("pcb"), lab=document.getElementById("pct");
+    if(bar){ bar.style.left=(up?cyc/3:(1-(cyc-3)/3))*98+"%";
+      lab.textContent=(up?"UP  ":"DOWN  ")+(up?Math.ceil(3-cyc):Math.ceil(3-(cyc-3)));
+      if(Math.floor(PC.t/3)!==PC.half){ PC.half=Math.floor(PC.t/3); buzz(35); } } }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ============================================================
+   KNEE — reference only
+   ============================================================ */
+const DX = [
+ ["Patellar tendinopathy","Localised at the <b>inferior</b> pole of the patella. Loads up with jumping, squatting, decline. Warms up, then returns after. Dose-dependent.","<b>Plan as written.</b> HSR is the core."],
+ ["Quadriceps tendinopathy","Pain at the <b>superior</b> pole of the patella.","Same HSR logic, different palpation point. Broadly compatible."],
+ ["Patellofemoral pain","Diffuse, retropatellar or peripatellar. Worse on stairs, hills, prolonged sitting.","Reduce deep-flexion loading early. <b>Increase</b> hip abductor and quad work. The deep hack squat may need range limits."],
+ ["Fat pad impingement","<b>Below</b> the patella. Worse with hyperextension and prolonged standing.","Avoid terminal extension and lockout. Leg extension may need range restriction."],
+ ["Early tibiofemoral OA","Morning stiffness, crepitus, joint-line pain, swelling after volume.","Volume and frequency become the tuning variables rather than load."]
+];
+function renderKnee(){
+  $("#v-knee").innerHTML = `
+  <div class="note halt"><div class="nt">Confirm the diagnosis</div>
+    <p>This plan is built for <strong>patellar tendinopathy</strong>. The loading prescription genuinely differs across the alternatives below, and a physiotherapist can settle it in one appointment. Bilateral, gradual onset under load at 39 makes patellar tendinopathy a reasonable prior — but a reasonable prior is not a diagnosis.</p></div>
+  <div class="scroll"><table class="tbl"><tr><th>If it is</th><th>Pattern</th><th>What changes</th></tr>
+    ${DX.map(d=>`<tr><td><strong>${d[0]}</strong></td><td class="small">${d[1]}</td><td class="small">${d[2]}</td></tr>`).join("")}
+  </table></div>
+
+  <h2>The 24-hour rule</h2>
+  <div class="note tendon"><div class="nt">This outranks everything else</div>
+    <p>Pain up to <strong>3/10 during loading is acceptable</strong> — tendon rehab is not meant to be pain-free. What matters is that it <strong>returns to baseline within 24 hours</strong>. Test with a single-leg decline squat on a 25° board the morning after a lower session, same setup, same time of day.</p>
+    <p>Above 3/10 or not settled means one tier lighter next session. Two flares in a row means hold the load for two cycles and get eyes on it.</p></div>
+  <a class="vid sm" href="${yt('single leg decline squat test tendinopathy how to')}" target="_blank" rel="noopener">▶ Decline squat test</a>
+
+  <h2>The tendon programme</h2>
+  <div class="card"><table class="tbl">
+    <tr><th>Slot</th><th>Movement</th><th>Prescription</th></tr>
+    <tr><td class="m">01</td><td>Hack / pendulum squat</td><td class="m" style="color:var(--tendon)">4 × 6–10 · 3s/3s</td></tr>
+    <tr><td class="m">01</td><td>Leg extension, long length</td><td class="m" style="color:var(--tendon)">3 × 12–15 · 3s/3s</td></tr>
+    <tr><td class="m">04</td><td>Leg extension</td><td class="m" style="color:var(--tendon)">3 × 10–12 · 3s/3s</td></tr>
+  </table>
+  <p class="small" style="margin:10px 0 0">That is the whole tendon programme. Twice per cycle, heavy, slow, embedded in the lifting slots rather than run as a separate injury block. Start at a load you can control for about 15 reps at 3s/3s and let it drift toward 6 over the months, moving only when the 24-hour rule keeps clearing.</p>
+  <a class="vid sm" href="${yt('heavy slow resistance patellar tendinopathy protocol')}" target="_blank" rel="noopener">▶ Heavy Slow Resistance explained</a></div>
+
+  <div class="note"><div class="nt" style="color:var(--tendon)">Why HSR, honestly</div>
+    <p>Never beaten by any other exercise intervention in the 2026 network meta-analysis of 17 RCTs, and in Kongsgaard 2009 it matched eccentric training on pain and function at 12 weeks while producing superior collagen turnover, reduced neovascularisation and higher 6-month satisfaction.</p>
+    <p><strong>The part usually left out:</strong> in that same trial tendon mechanical properties were unaffected by treatment. Symptom improvement is not the same as structural repair.</p></div>
+
+  <h2>Isometrics — optional</h2>
+  <div class="card"><p class="small"><strong>Spanish squat: 5 × 45 s at ~70% MVIC.</strong> Band behind the knees, torso upright. Correctly performed this reaches roughly 70% MVIC where a wall sit reaches about 60%.</p>
+    <p class="small">The dosing comes from Rio 2015 — <strong>n = 6</strong>. Clifford 2020 (10 studies) found isometric exercise was not superior to isotonic at any timepoint up to 12 weeks. Keep it if it helps you on the day; drop it if it just tires your quads. Either choice is evidence-consistent.</p>
+    <a class="vid sm" href="${yt('Spanish squat setup patellar tendon isometric')}" target="_blank" rel="noopener">▶ Spanish squat setup</a></div>
+
+  <h2>Treat the donut, not the hole</h2>
+  <div class="card"><p class="small" style="margin:0">Tendon imaging abnormalities are common in people with no symptoms and correlate poorly with pain; symptoms improve without structural change on imaging. Rehab works by building capacity in the healthy tissue around the pathology. Your progress metric is <strong>what you can load without a 24-hour flare</strong> — never a scan.</p></div>
+
+  <h2>The plyometric gate</h2>
+  <div class="note halt"><div class="nt">All three, not any one</div>
+    <p>No jumping, bounding or reactive loading until: single-leg press about 150% bodyweight pain-free on <strong>both</strong> legs; single-leg decline squat at 2/10 or below; and four clear weeks with no 24-hour flare. Even then, given the current neurological situation, clear it with your doctor first.</p></div>
+
+  <h2>Supporting work, already in the plan</h2>
+  <div class="card"><table class="tbl">
+    <tr><td>Glute medius · hip abduction</td><td class="m">both lower slots</td></tr>
+    <tr><td>Adductors · Copenhagen</td><td class="m">both lower slots</td></tr>
+    <tr><td>Hamstrings · seated curl + Nordic</td><td class="m">slot 04</td></tr>
+    <tr><td>Tibialis anterior</td><td class="m">both lower slots</td></tr>
+    <tr><td>Gastrocnemius / soleus</td><td class="m">both, each slot</td></tr>
+  </table></div>
+  <a class="vid sm" href="${yt('Nordic hamstring curl progression beginner')}" target="_blank" rel="noopener">▶ Nordic hamstring progression</a>
+  <a class="vid sm" href="${yt('Copenhagen adduction progression short lever')}" target="_blank" rel="noopener">▶ Copenhagen progression</a>`;
+}
+
+/* ============================================================
+   NERVE — the new situation
+   ============================================================ */
+function renderNerve(){
+  $("#v-nerve").innerHTML = `
+  <div class="med">
+    <div class="nt">Get this looked at</div>
+    <p>Two neurological episodes now, months apart, in different parts of the body: four months of right-leg numbness that resolved on its own, and an acute simultaneous right perioral and right little-finger event during heavy training.</p>
+    <p>The C8-and-trigeminal explanation is anatomically coherent for the second event. <strong>It does not account for the first.</strong> Mechanical compression from lifting resolves in hours to days, as your finger did — it does not usually produce four months of numbness and then clear. Two events separated in time and location is the pattern that triggers a workup rather than form coaching.</p>
+    <p><strong>Ask for:</strong> haematocrit and haemoglobin, blood pressure, and a neurological examination. Mention the four-month leg episode explicitly — that is the detail that changes what they look for. Imaging of brain and cervical spine may follow depending on the exam.</p>
+  </div>
+
+  <h2>Why TRT raises the stakes</h2>
+  <div class="card"><p class="small">Testosterone therapy raises haematocrit. Raised haematocrit raises blood viscosity, and that raises thrombotic risk. Acute one-sided facial numbness in a man on TRT who lifts heavily is a scenario where <strong>stroke and TIA need excluding</strong>, not reasoning around.</p>
+  <p class="small" style="margin-bottom:0">Endocrine Society guidance: check haematocrit at baseline, 3–6 months, then annually; withhold testosterone above 54% until it normalises. Some clinicians watch from 50–52%. If yours is drifting up, that is directly relevant to what you are experiencing.</p></div>
+
+  <h2>Emergency signs</h2>
+  <div class="note halt"><div class="nt">Stop everything and seek emergency care</div>
+    ${NEURO_STOP.map(x=>`<p>— ${x}</p>`).join("")}</div>
+
+  <h2>What changed in the plan because of this</h2>
+  <div class="card"><table class="tbl">
+    <tr><td class="m" style="color:var(--halt)">Removed</td><td><strong>All neck training.</strong> It was optional in the first place and it loads exactly the tissue implicated.</td></tr>
+    <tr><td class="m" style="color:var(--halt)">Removed</td><td><strong>Any behind-the-neck movement.</strong> None remain in the plan.</td></tr>
+    <tr><td class="m" style="color:var(--load)">Changed</td><td><strong>Overhead press is now seated with a back pad.</strong> A standing press loads the neck stabilisers and invites breath-holding.</td></tr>
+    <tr><td class="m" style="color:var(--load)">Changed</td><td><strong>Shrugs lightened</strong> to 2 × 12–15 at moderate load, no straps.</td></tr>
+    <tr><td class="m" style="color:var(--load)">Added</td><td><strong>Cervical mobility and a breathing/bracing drill</strong> to every warm-up.</td></tr>
+    <tr><td class="m" style="color:var(--load)">Added</td><td><strong>A neck decompression step</strong> to every cool-down.</td></tr>
+    <tr><td class="m" style="color:var(--halt)">Gated</td><td><strong>The 4×4 needs clearance</strong> before you run it. Zone 2 fills the slot meanwhile.</td></tr>
+    <tr><td class="m" style="color:var(--ok)">Rule</td><td><strong>Exhale on effort. Never hold your breath under load.</strong> This applies to every set of every session.</td></tr>
+  </table></div>
+
+  <h2>The breathing rule, in detail</h2>
+  <div class="note load"><div class="nt">Why this matters more than any exercise swap</div>
+    <p>A hard Valsalva — bracing by holding your breath — raises pressure in the chest, which raises venous pressure in the head and neck. Combined with a strained neck position and tight scalenes, that is the most plausible mechanical route to irritating both the C8 root and the descending trigeminal tract at the same instant.</p>
+    <p>You still need to brace. You just need to brace <strong>while exhaling</strong> rather than against a closed throat. Practise it in the warm-up: hand on the belly, create trunk stiffness, then breathe out slowly while keeping the stiffness. If you cannot complete a rep this way, the load is too heavy for today.</p></div>
+  <a class="vid sm" href="${yt('brace core without holding breath exhale on effort lifting')}" target="_blank" rel="noopener">▶ Bracing without breath-holding</a>
+  <a class="vid sm" href="${yt('cervical mobility chin nod upper trap scalene stretch routine')}" target="_blank" rel="noopener">▶ Neck mobility routine</a>
+
+  <h2>If symptoms return during a session</h2>
+  <div class="card"><table class="tbl">
+    <tr><td class="m">01</td><td>Rack the weight. End the session — do not finish the remaining exercises.</td></tr>
+    <tr><td class="m">02</td><td>Note what you were doing, the load, and whether you were holding your breath.</td></tr>
+    <tr><td class="m">03</td><td>If anything on the emergency list above appears, seek care immediately.</td></tr>
+    <tr><td class="m">04</td><td>If not, tell your doctor at the next appointment regardless. A pattern of recurrence is diagnostic information.</td></tr>
+    <tr><td class="m">05</td><td>Next session: drop loads about 20%, remove overhead work entirely, and rebuild only once you are symptom-free across two full cycles.</td></tr>
+  </table></div>
+  <p class="small">None of this is a reason to stop training. It is a reason to train in a way that stops making the same event more likely while you find out what is going on.</p>`;
+}
+
+/* ============================================================
+   NOTES
    ============================================================ */
 function volume(){
-  const tot={}, freq={};
+  const tot={},freq={};
   Object.entries(S).forEach(([k,ses])=>{
     const seen=new Set();
     ses.ex.forEach(e=>{
@@ -1178,773 +1253,84 @@ function volume(){
     });
     seen.forEach(mu=>freq[mu]=(freq[mu]||0)+1);
   });
-  return Object.entries(tot)
-    .map(([mu,v])=>({mu, v:Math.round(v*10)/10, f:freq[mu]}))
-    .sort((a,b)=>b.v-a.v);
+  return Object.entries(tot).map(([mu,v])=>({mu,v:Math.round(v*10)/10,f:freq[mu]})).sort((a,b)=>b.v-a.v);
 }
-
-/* ============================================================
-   RENDER
-   ============================================================ */
-const $ = s=>document.querySelector(s);
-let selDay = 0;
-
-function railHTML(){
-  return `<div class="rail">${WEEK.map((d,idx)=>{
-    if(d.lane==="rest") return `<div class="col ${idx===selDay?'sel':''}" data-d="${idx}">
-        <div class="chip rest"><span class="ct">REST</span></div><span class="dow">${d.d}</span></div>`;
-    const cls = d.lane==="top" ? "chip top load" : "chip bot aero";
-    return `<div class="col ${idx===selDay?'sel':''}" data-d="${idx}">
-      <div class="${cls}"><span class="ct">${d.t}</span><span class="cs">${d.s}</span>
-        ${d.tendon?'<i class="tdot"></i>':''}</div>
-      <span class="dow">${d.d}</span></div>`;
-  }).join("")}</div>
-  <div class="rail-key">
-    <span><i style="background:var(--load)"></i>Resistance</span>
-    <span><i style="background:var(--aero)"></i>Conditioning</span>
-    <span><i style="background:var(--tendon);border-radius:50%"></i>Tendon load</span>
-    <span>Rails never meet — that is the design</span>
-  </div>`;
-}
-
-function renderWeek(){
-  const d = WEEK[selDay];
-  const vols = volume();
-  const max = Math.max(...vols.map(v=>v.v));
-  $("#v-week").innerHTML = `
-  ${railHTML()}
-  <div class="note ${d.lane==='bot'?'aero':d.lane==='rest'?'':'load'}">
-    <div class="nt">${d.d} — ${d.full}</div>
-    <p>${d.why}</p>
-  </div>
-  ${d.key!=="rest" ? `<button class="b go ${d.lane==='bot'?'aero':''}" style="width:100%;margin-bottom:18px" onclick="goSession('${d.key}')">Open ${d.full} →</button>`:""}
-
-  <h2>Why this order, not yours</h2>
-  <div class="scroll"><table class="tbl">
-    <tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
-    <tr><td class="m" style="color:var(--ash)">Yours</td><td class="m">Up A</td><td class="m">Lo A</td><td class="m">Z2</td><td class="m">Up B</td><td class="m">Lo B</td><td class="m">Z2/4×4</td><td class="m">Rest</td></tr>
-    <tr><td class="m" style="color:var(--load)">This</td><td class="m">Lo A</td><td class="m">Up A</td><td class="m">Z2</td><td class="m">Lo B</td><td class="m">Up B</td><td class="m">Z2/4×4</td><td class="m">Rest</td></tr>
-  </table></div>
-  <p class="small">Both satisfy every hard constraint you set. The swap buys two things. <strong>Tendon-first freshness</strong> — the heaviest tendon session lands straight after the rest day, and this whole block is gated on tendon tolerance. And <strong>48 hours instead of 24</strong> between your last heavy lower day and the maximal-HR intervals. Nothing else changes; revert it if you prefer your original.</p>
-
-  <h2>What the layout achieves</h2>
-  <div class="card">
-    <table class="tbl">
-      <tr><td class="m" style="color:var(--load)">0 h</td><td>Same-session concurrent training. The ≥6 h separation rule is satisfied permanently, by structure rather than by discipline.</td></tr>
-      <tr><td class="m" style="color:var(--load)">72 h</td><td>Between Lower A and Lower B, and between Upper A and Upper B.</td></tr>
-      <tr><td class="m" style="color:var(--load)">48 h</td><td>Between heavy legs and maximal-HR intervals.</td></tr>
-      <tr><td class="m" style="color:var(--load)">2×</td><td>Weekly sessions for every muscle group — verified by set count below, not asserted.</td></tr>
-    </table>
-  </div>
-
-  <div class="note">
-    <div class="nt" style="color:var(--ash)">Why separation matters more than the brief claimed</div>
-    <p>The usual summary — "interference only hits explosive power" — is true of the pooled estimate but incomplete. Stratify by sex and region and a real lower-body strength effect appears in males (SMD −0.43, Huiberts 2024), concentrated in same-session pairings (−0.66 same-session vs −0.10 separated, Petré 2021).</p>
-    <p>You are a trained male whose headline goals are maximal strength and hypertrophy, with the lower body carrying the rehab load. Full separation is not a nicety here. It is the highest-leverage structural decision in the programme.</p>
-  </div>
-
-  <h2>Weekly volume, computed</h2>
-  <p class="small">Direct sets count as 1, indirect as 0.5 — the fractional method from Pelland 2026. These numbers are calculated live from the sessions in this app, so they cannot drift from what you actually do. Marker line = 16 sets.</p>
-  ${vols.map(v=>{
-    const pri = v.v>=16, reh = ["Hip abductors","Adductors","Tibialis anterior","Rotator cuff"].includes(v.mu);
-    return `<div class="vol">
-      <div class="vol-t"><span>${v.mu} <span style="color:var(--ash-dim);font-size:11px">${v.f}×/wk</span></span><span>${v.v}</span></div>
-      <div class="vol-b"><i class="${pri?'pri':reh?'reh':''}" style="width:${Math.min(100,v.v/max*100)}%"></i><u style="left:${16/max*100}%"></u></div>
-    </div>`;}).join("")}
-  <p class="small" style="margin-top:14px"><strong>Every muscle ≥2×/week, and no muscle exceeds ~9 direct sets in a single session</strong> — under the ~11 fractional per-session soft ceiling. The old Saturday half day is fully absorbed with no fifth lifting day.</p>
-
-  <h2>Where the half day went</h2>
-  <div class="scroll"><table class="tbl">
-    <tr><th>Old half-day item</th><th>Now lives in</th><th>Change</th></tr>
-    <tr><td>Cable lateral raise</td><td class="m">Upper A + Upper B</td><td>3 → 7 sets, 2×/wk</td></tr>
-    <tr><td>Overhead triceps ext.</td><td class="m">Upper A</td><td>+1 set, long-length kept</td></tr>
-    <tr><td>Incline curl</td><td class="m">Upper A</td><td>+1 set</td></tr>
-    <tr><td>Wrist / reverse curls</td><td class="m">Upper A + Upper B</td><td>3 → 8 sets, 2×/wk</td></tr>
-    <tr><td>Standing + seated calf</td><td class="m">Lower A + Lower B</td><td>6 → 12 sets, both heads 2×/wk</td></tr>
-    <tr><td>Weighted carries</td><td class="m">Upper A finisher</td><td>unchanged</td></tr>
-    <tr><td>Neck (optional)</td><td class="m">Upper B</td><td>only if athletic goals</td></tr>
-    <tr><td>Core circuit 10–15 min</td><td class="m">Lower A + Lower B</td><td>→ 3 targeted movements</td></tr>
-    <tr><td>Rear-delt work</td><td class="m">Upper A + Upper B</td><td>now explicitly 2×/wk</td></tr>
-  </table></div>`;
-  document.querySelectorAll(".col").forEach(c=>c.onclick=()=>{selDay=+c.dataset.d;renderWeek();});
-}
-
-let curSession = "lowerA";
-function goSession(k){ curSession=k; setView("train"); }
-
-/* HSR tier for the current block week — shown on tendon movements */
-function hsrTier(w){
-  if(w<=3) return "~15RM";
-  if(w<=5) return "~12RM";
-  if(w===6) return "~10RM";
-  if(w===7) return "deload · hold load, 2 sets";
-  if(w<=10) return "~8RM";
-  return "~6RM";
-}
-function rirTarget(w){
-  if(w<=3) return "2–3"; if(w<=6) return "1–3"; if(w===7) return "3–4"; return "1–2";
-}
-function phaseName(w){
-  if(w<=3) return "Accumulation"; if(w<=6) return "Progression"; if(w===7) return "Deload";
-  if(w<=10) return "Intensification"; return "Peak";
-}
-
-function exHTML(e,i,key){
-  const id = key+"-"+i;
-  const done = state.ticks[id]||[];
-  const c = CUES[e.n];
-  const saved = (state.loads&&state.loads[id])||"";
-  return `<div class="ex ${e.hsr?'hsr':''} ${e.opt?'opt':''}" data-x="${id}">
-    <div class="ex-h" onclick="this.parentNode.classList.toggle('open')">
-      <span class="ex-n">${String(i+1).padStart(2,'0')}</span>
-      <div class="ex-b">
-        <div class="ex-name">${e.n}${e.left?' <span style="color:var(--tendon);font-size:11px">◂ left first</span>':''}</div>
-        <div class="ex-dose">${e.dose}${e.hsr?'  ·  HSR '+hsrTier(state.week):''}${e.opt?'  ·  optional':''}</div>
-      </div>
-      <span class="ex-car">›</span>
-    </div>
-    <div class="ex-d">
-      <div class="spec">
-        <div><div class="k">RIR</div><div class="v">${e.rir}</div></div>
-        <div><div class="k">Rest</div><div class="v">${e.rest}</div></div>
-        <div><div class="k">Tempo</div><div class="v">${e.tempo}</div></div>
-      </div>
-      ${c?`<div class="pills"><span class="pill">${c.t}</span><span class="pill">${c.eq}</span>${e.hsr?'<span class="pill hl">Tendon track · '+hsrTier(state.week)+'</span>':''}</div>`:""}
-      <div class="why" style="margin-top:11px">${e.why}</div>
-      ${c?`<div class="dd">
-        <div class="do"><h5>Do</h5>${c.do.map(x=>`<div class="it">${x}</div>`).join("")}</div>
-        <div class="dont"><h5>Don't</h5>${c.dont.map(x=>`<div class="it">${x}</div>`).join("")}</div>
-      </div>`:""}
-      <div class="sets"><span class="lbl">Sets</span>${
-        Array.from({length:e.sets},(_,s)=>`<button class="tick ${done.includes(s)?'done':''}" onclick="tick('${id}',${s},this)">${s+1}</button>`).join("")
-      }</div>
-      <div class="log">
-        <span class="lg">Load</span>
-        <input type="text" value="${saved.replace(/"/g,'&quot;')}" placeholder="e.g. 60 kg × 8, 8, 7" onchange="logLoad('${id}',this.value)">
-      </div>
-      ${c?`<a class="vid" href="${yt(c.vid)}" target="_blank" rel="noopener">▶ Form video — ${e.n.split(" — ")[0]}</a>`:""}
-    </div>
-  </div>`;
-}
-
-async function tick(id,s,el){
-  const a = state.ticks[id]||[];
-  const idx = a.indexOf(s);
-  if(idx>=0) a.splice(idx,1); else a.push(s);
-  state.ticks[id]=a;
-  el.classList.toggle("done");
-  await store.set("ticks",state.ticks);
-}
-async function logLoad(id,v){
-  state.loads = state.loads||{};
-  state.loads[id]=v;
-  await store.set("loads",state.loads);
-}
-
-/* session completion, used by Today */
-function progress(key){
-  const s = S[key]; if(!s) return null;
-  let total=0, done=0;
-  s.ex.forEach((e,i)=>{ if(e.opt) return; total+=e.sets; done+=((state.ticks[key+"-"+i]||[]).length); });
-  return {total, done, pct: total? Math.round(done/total*100):0};
-}
-async function resetSession(key){
-  const s=S[key]; if(!s) return;
-  s.ex.forEach((e,i)=>{ delete state.ticks[key+"-"+i]; });
-  await store.set("ticks",state.ticks);
-  renderTrain();
-}
-
-function renderTrain(){
-  const isLift = !!S[curSession];
-  const picker = `<div class="rail-key" style="border:none;padding-bottom:10px;gap:6px">${
-    [...Object.keys(S),"zone2","vo2"].map(k=>{
-      const o = S[k]||COND[k];
-      const on = k===curSession;
-      return `<button class="b" style="flex:0 0 auto;padding:8px 11px;${on?'background:var(--'+(S[k]?'load':'aero')+');border-color:var(--'+(S[k]?'load':'aero')+');color:#000;font-weight:700':''}" onclick="goSession('${k}')">${o.name}</button>`;
-    }).join("")}</div>`;
-
-  if(isLift){
-    const s = S[curSession];
-    const hasHSR = s.ex.some(e=>e.hsr);
-    const hasIso = s.ex.some(e=>e.opt && e.n.includes("Spanish"));
-    $("#v-train").innerHTML = `${picker}
-      <div class="eyebrow" style="margin-top:4px">${s.day} · Resistance</div>
-      <h3 style="font-size:21px;margin:3px 0 5px">${s.name}</h3>
-      <p class="small">${s.tag}</p>
-      <div class="note load" style="margin-top:12px"><div class="nt">The point of this session</div><p>${s.head}</p></div>
-      ${(()=>{const pr=progress(curSession);return `<div class="card" style="display:flex;align-items:center;gap:13px">
-        <svg width="46" height="46" style="transform:rotate(-90deg);flex:0 0 auto"><circle cx="23" cy="23" r="19" fill="none" stroke="#2a323f" stroke-width="4"/>
-        <circle cx="23" cy="23" r="19" fill="none" stroke="var(--load)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2*Math.PI*19}" stroke-dashoffset="${2*Math.PI*19*(1-pr.pct/100)}"/></svg>
-        <div style="flex:1"><div style="font-family:var(--mono);font-size:13px"><b>${pr.done} / ${pr.total}</b> working sets</div>
-        <div class="small" style="margin:0">Week ${state.week} · ${phaseName(state.week)} · RIR ${rirTarget(state.week)}</div></div>
-        <button class="b" style="flex:0 0 auto;padding:8px 11px" onclick="resetSession('${curSession}')">Reset</button></div>`;})()}
-
-      <h2>Warm-up · every lifting day</h2>
-      <div class="card"><table class="tbl">
-        <tr><td class="m">5 min</td><td>Zone 1–2 bike or row. Warm-up only — this does not count as aerobic volume.</td></tr>
-        <tr><td class="m">5 min</td><td>Dynamic mobility: hips, <strong>ankles</strong> (weighted dorsiflexion — directly relevant to knee tracking), t-spine, shoulders.</td></tr>
-        <tr><td class="m">2–3 sets</td><td>Movement-specific ramp on the first compound, ending one set below working weight.</td></tr>
-        <tr><td class="m">✕</td><td>No static-stretch-only warm-up before heavy lifting.</td></tr>
-      </table>
-      <a class="vid sm" href="${yt('dynamic warm up hips ankles t-spine before lifting')}" target="_blank" rel="noopener">▶ Dynamic warm-up routine</a>
-      <a class="vid sm" href="${yt('weighted ankle dorsiflexion mobility drill knee')}" target="_blank" rel="noopener">▶ Ankle dorsiflexion drill</a></div>
-
-      <h2>Session</h2>
-      ${s.ex.map((e,i)=>exHTML(e,i,curSession)).join("")}
-
-      <h2>Tools</h2>
-      ${hasHSR?tempoTool():""}
-      ${hasIso?holdTool():""}
-      ${restTool()}
-
-      <div class="note tendon"><div class="nt">Left knee — attention, not extra heavy load</div>
-        <p>On every unilateral movement, <strong>lead with the left</strong>: perform it first, take it to the prescribed RIR, then match that rep count on the right. The symptomatic side sets the dose, so the strong side cannot drag the weak side into overload.</p>
-        <p>Add <strong>one extra set of low-load accessory work</strong> to the left — abduction, tibialis, terminal-range extension. Do <strong>not</strong> add extra heavy HSR sets to the left. The more symptomatic tendon is the one most likely to breach the 24-hour rule, and tendons adapt to load progression rather than to load volume.</p></div>`;
-  } else {
-    const c = COND[curSession];
-    if(curSession==="zone2"){
-      $("#v-train").innerHTML = `${picker}
-        <div class="eyebrow" style="margin-top:4px">${c.day} · Conditioning · standalone</div>
-        <h3 style="font-size:21px;margin:3px 0 5px">${c.name}</h3>
-        <p class="small">${c.tag}</p>
-        <div class="note aero" style="margin-top:12px"><div class="nt">Reframed</div><p>${c.head}</p></div>
-        <h2>Your numbers</h2>
-        ${hrBox('z2')}
-        <h2>Prescription</h2>
-        <div class="card"><table class="tbl">${c.spec.map(s=>`<tr><td class="m" style="color:var(--aero)">${s[1]}</td><td>${s[0]}</td></tr>`).join("")}</table>
-        <a class="vid sm" href="${yt('zone 2 training how to find your intensity talk test')}" target="_blank" rel="noopener">▶ Finding your Zone 2 intensity</a></div>
-        <div class="note"><div class="nt" style="color:var(--aero)">The talk test</div><p>${c.talk}</p></div>
-        <h2>What it is for</h2>
-        <div class="card">${c.purpose.map(p=>`<p class="tight">— ${p}</p>`).join("")}
-        <div class="dd" style="margin-top:14px">
-          <div class="do"><h5>Do</h5>
-            <div class="it">Pick one modality and stay on it so the threshold test stays comparable</div>
-            <div class="it">Hold a steady output — no surges up hills or on the rower</div>
-            <div class="it">Use it as active recovery between Lower A and Lower B</div>
-            <div class="it">Nasal breathing is a decent proxy if you have no monitor</div></div>
-          <div class="dont"><h5>Don't</h5>
-            <div class="it">Don't let it creep into tempo — that is the single most common error</div>
-            <div class="it">Don't run while the tendon is symptomatic</div>
-            <div class="it">Don't add lifting to this day, even "just a few sets"</div>
-            <div class="it">Don't skip it on the theory that intervals replaced it — they cost more recovery</div></div>
-        </div></div>
-        <div class="note halt"><div class="nt">What it is not for</div><p>${c.notPurpose}</p></div>
-        <h2>Aerobic threshold test</h2>
-        <div class="card"><p class="small" style="margin:0">${c.test}</p></div>
-        ${restTool()}`;
-    } else {
-      $("#v-train").innerHTML = `${picker}
-        <div class="eyebrow" style="margin-top:4px">${c.day} · Conditioning · standalone</div>
-        <h3 style="font-size:21px;margin:3px 0 5px">${c.name}</h3>
-        <p class="small">${c.tag}</p>
-        <div class="note halt" style="margin-top:12px"><div class="nt">Clear this with your physician first</div>
-          <p>Maximal-HR intervals on top of TRT-driven erythrocytosis and heavy lifting stack three cardiovascular stressors. That is not a reason to avoid intervals — it is a reason to have your prescriber say yes explicitly, with a current hematocrit and blood pressure in hand.</p></div>
-        <div class="note aero"><div class="nt">Why this is the default now</div><p>${c.head}</p></div>
-        <h2>Protocol · ~38 min</h2>
-        <div class="scroll"><table class="tbl"><tr><th>Phase</th><th>Time</th><th>Intensity</th></tr>
-          ${c.phases.map(p=>`<tr><td>${p[0]}</td><td class="m" style="color:var(--aero)">${p[1]}</td><td class="m">${p[2]}</td></tr>`).join("")}
-        </table></div>
-        ${hrBox('hi')}
-        ${intervalTool()}
-        <div class="card"><div class="dd" style="margin-top:0">
-          <div class="do"><h5>Do</h5>
-            <div class="it">Warm up fully — 10 minutes, finishing near the recovery pace</div>
-            <div class="it">Build into interval one; heart rate lags by roughly two minutes</div>
-            <div class="it">Keep moving through the recovery blocks rather than stopping dead</div>
-            <div class="it">Aim to finish interval four at the same output as interval one</div></div>
-          <div class="dont"><h5>Don't</h5>
-            <div class="it">Don't sprint the first minute — this is a four-minute effort, not a sprint</div>
-            <div class="it">Don't run it while the tendon is symptomatic; bike or row instead</div>
-            <div class="it">Don't run it during a deload week</div>
-            <div class="it">Don't proceed without physician clearance on TRT</div></div>
-        </div>
-        <a class="vid sm" href="${yt('Norwegian 4x4 interval training protocol how to')}" target="_blank" rel="noopener">▶ How to run the Norwegian 4×4</a></div>
-        <div class="note"><div class="nt" style="color:var(--aero)">Pacing</div><p>${c.pacing}</p></div>
-        <div class="note"><div class="nt" style="color:var(--aero)">Modality</div><p>${c.modality}</p></div>
-        <h2>Swap it for Zone 2 when</h2>
-        <div class="card">${c.swap.map(s=>`<p class="tight">— ${s}</p>`).join("")}</div>
-        <div class="note"><div class="nt" style="color:var(--ash)">Honest note on the evidence</div>
-          <p>Helgerud 2007 established this protocol, and high-intensity intervals clearly beat volume-matched moderate training over 8 weeks. Two things usually left out: the 15/15 protocol in the same trial performed comparably, so <strong>intensity is the active ingredient, not the 4-minute block</strong>. And the one long RCT designed to test whether interval training reduces mortality — Generation 100, 1,567 adults over 5 years — found no significant difference.</p></div>`;
-    }
-  }
-}
-
-/* ============================================================
-   TOOLS — one timer engine, four presets
-   ============================================================ */
-function tempoTool(){return `<div class="tool">
-  <div class="tool-top"><span class="tool-name">Tempo pacer · 3 s / 3 s</span><span class="tool-hint">HSR movements</span></div>
-  <div class="pacer" id="pc"><i id="pcb"></i><span id="pct">Ready</span></div>
-  <div class="btns"><button class="b go tendon" id="pcgo" onclick="togglePacer()">Start</button></div>
-  <p class="small" style="margin:11px 0 0">Three seconds up, three seconds down. Load the bar so the last rep of the set still holds the tempo — if the tempo breaks, the set ended two reps ago.</p></div>`;}
-
-function holdTool(){return `<div class="tool">
-  <div class="tool-top"><span class="tool-name">Isometric hold · 5 × 45 s</span><span class="tool-hint">Spanish squat, optional</span></div>
-  <div class="readout" id="hdR">45</div><div class="phase" id="hdP">Set 1 of 5 · ready</div>
-  <div class="bar"><i class="tendon" id="hdB"></i></div>
-  <div class="btns"><button class="b go tendon" id="hdgo" onclick="toggleTimer('hd')">Start</button><button class="b" onclick="resetTimer('hd')">Reset</button></div></div>`;}
-
-function intervalTool(){return `<div class="tool">
-  <div class="tool-top"><span class="tool-name">4×4 interval timer</span><span class="tool-hint">~38 min total</span></div>
-  <div class="readout" id="ivR">10:00</div><div class="phase" id="ivP">Warm-up · ready</div>
-  <div class="bar"><i class="aero" id="ivB"></i></div>
-  <div class="btns"><button class="b go aero" id="ivgo" onclick="toggleTimer('iv')">Start</button><button class="b" onclick="resetTimer('iv')">Reset</button></div></div>`;}
-
-function restTool(){return `<div class="tool">
-  <div class="tool-top"><span class="tool-name">Rest timer</span><span class="tool-hint">tap to set</span></div>
-  <div class="readout" id="rsR">3:00</div><div class="phase" id="rsP">ready</div>
-  <div class="bar"><i id="rsB"></i></div>
-  <div class="btns" style="margin-bottom:7px">
-    <button class="b" onclick="setRest(60)">60 s</button>
-    <button class="b" onclick="setRest(90)">90 s</button>
-    <button class="b" onclick="setRest(120)">2 min</button>
-    <button class="b" onclick="setRest(180)">3 min</button>
-    <button class="b" onclick="setRest(300)">5 min</button>
-  </div>
-  <div class="btns"><button class="b go" id="rsgo" onclick="toggleTimer('rs')">Start</button><button class="b" onclick="resetTimer('rs')">Reset</button></div></div>`;}
-
-const IV_PHASES = [["Warm-up",600],["Interval 1",240],["Recovery",180],["Interval 2",240],["Recovery",180],["Interval 3",240],["Recovery",180],["Interval 4",240],["Cool-down",300]];
-const HD_PHASES = [["Hold 1",45],["Rest",120],["Hold 2",45],["Rest",120],["Hold 3",45],["Rest",120],["Hold 4",45],["Rest",120],["Hold 5",45]];
-const T = {
-  iv:{ph:IV_PHASES,i:0,left:600,on:false,r:"ivR",p:"ivP",b:"ivB",g:"ivgo"},
-  hd:{ph:HD_PHASES,i:0,left:45,on:false,r:"hdR",p:"hdP",b:"hdB",g:"hdgo"},
-  rs:{ph:[["Rest",180]],i:0,left:180,on:false,r:"rsR",p:"rsP",b:"rsB",g:"rsgo"}
-};
-function fmt(s){const m=Math.floor(s/60),x=Math.floor(s%60);return m>0?m+":"+String(x).padStart(2,"0"):String(x);}
-function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
-function paint(k){
-  const t=T[k], r=document.getElementById(t.r); if(!r) return;
-  const [nm,dur]=t.ph[t.i];
-  r.textContent=fmt(Math.ceil(t.left));
-  const total=t.ph.length;
-  document.getElementById(t.p).textContent = k==="hd"
-    ? `${nm} · ${Math.floor(t.i/2)+1} of 5`
-    : (total>1 ? `${nm} · ${t.i+1} of ${total}` : nm);
-  document.getElementById(t.b).style.width = ((dur-t.left)/dur*100)+"%";
-  const g=document.getElementById(t.g); if(g) g.textContent = t.on?"Pause":"Start";
-}
-function toggleTimer(k){ T[k].on=!T[k].on; paint(k); }
-function resetTimer(k){ const t=T[k]; t.on=false; t.i=0; t.left=t.ph[0][1]; paint(k); }
-function setRest(s){ T.rs.ph=[["Rest",s]]; resetTimer("rs"); }
-let last=performance.now();
-function loop(now){
-  const dt=(now-last)/1000; last=now;
-  Object.keys(T).forEach(k=>{
-    const t=T[k]; if(!t.on) return;
-    if(!document.getElementById(t.r)) return;
-    t.left-=dt;
-    if(t.left<=0){
-      if(t.i<t.ph.length-1){ t.i++; t.left=t.ph[t.i][1]; buzz([90,60,90]); }
-      else { t.on=false; t.left=0; buzz([200,80,200,80,200]); }
-    }
-    paint(k);
-  });
-  // tempo pacer
-  if(PC.on){
-    PC.t+=dt; const cyc=PC.t%6, up=cyc<3;
-    const bar=document.getElementById("pcb"), lab=document.getElementById("pct");
-    if(bar){
-      bar.style.left = (up? cyc/3 : (1-(cyc-3)/3))*98 + "%";
-      lab.textContent = (up?"UP  ":"DOWN  ") + (up?Math.ceil(3-cyc):Math.ceil(3-(cyc-3)));
-      if(Math.floor(PC.t/3)!==PC.half){ PC.half=Math.floor(PC.t/3); buzz(35); }
-    }
-  }
-  requestAnimationFrame(loop);
-}
-const PC={on:false,t:0,half:-1};
-function togglePacer(){
-  PC.on=!PC.on; if(PC.on){PC.t=0;PC.half=-1;}
-  const g=document.getElementById("pcgo"); if(g) g.textContent=PC.on?"Stop":"Start";
-  if(!PC.on){const l=document.getElementById("pct"); if(l) l.textContent="Ready";}
-}
-requestAnimationFrame(loop);
-
-/* ============================================================
-   KNEE
-   ============================================================ */
-const DX = [
- ["Patellar tendinopathy","Localised at the <b>inferior</b> pole of the patella. Loads up with jumping, squatting, decline. Warms up, then returns after. Dose-dependent.","<b>Programme as written.</b> HSR is the core."],
- ["Quadriceps tendinopathy","Pain at the <b>superior</b> pole of the patella.","Same HSR logic, different palpation point. Broadly compatible."],
- ["Patellofemoral pain","Diffuse, retropatellar or peripatellar. Worse on stairs, hills, prolonged sitting.","Reduce deep-flexion loading early. <b>Increase</b> hip abductor and quad work. The deep hack squat may need range limits."],
- ["Fat pad impingement","<b>Below</b> the patella. Worse with hyperextension and prolonged standing.","Avoid terminal extension and lockout. Leg extension may need range restriction."],
- ["Early tibiofemoral OA","Morning stiffness, crepitus, joint-line pain, swelling after volume.","Volume and frequency become the tuning variables rather than load. Different progression logic entirely."]
-];
-function renderKnee(){
-  const log = state.knee.slice(-14);
-  const recent = log.slice(-3).map(x=>x.v);
-  let vc="go", vt="Progress as scheduled. Tolerance is holding.";
-  if(recent.length && recent[recent.length-1]>3){ vc="drop"; vt="Above 3/10. Drop the tendon load one tier at the next session. Do not push through."; }
-  else if(recent.length>=2 && recent[recent.length-1]>=recent[recent.length-2] && recent[recent.length-1]>2){ vc="hold"; vt="Not trending down. Hold the current tier rather than advancing."; }
-  else if(!recent.length){ vc="hold"; vt="No entries yet. Log the morning after every lower day."; }
-
-  $("#v-knee").innerHTML = `
-  <div class="note halt"><div class="nt">Before week 1 — confirm the diagnosis</div>
-    <p>This programme is built for <strong>patellar tendinopathy</strong>. Your brief specifies "bilateral knee rehabilitation" without naming a diagnosis, and the loading prescription genuinely differs across the plausible alternatives. A physiotherapist or sports physician can settle this in one appointment. If you are 39, bilateral, and it came on gradually under load, patellar tendinopathy is a reasonable prior — but a reasonable prior is not a diagnosis.</p></div>
-  <div class="scroll"><table class="tbl"><tr><th>If it is</th><th>Pattern</th><th>What changes</th></tr>
-    ${DX.map(d=>`<tr><td><strong>${d[0]}</strong></td><td class="small">${d[1]}</td><td class="small">${d[2]}</td></tr>`).join("")}
-  </table></div>
-
-  <h2>The 24-hour rule</h2>
-  <div class="note tendon"><div class="nt">This outranks everything else in the programme</div>
-    <p>Pain <strong>≤3/10 during loading is acceptable</strong> — tendon rehab is not meant to be pain-free. What matters is that it <strong>returns to baseline within 24 hours</strong>.</p>
-    <p>It outranks the progression table, the RIR targets and your own impatience. It is the only real feedback signal a tendon gives you.</p></div>
-
-  <div class="card">
-    <h3>Morning-after test</h3>
-    <p class="small">Single-leg decline squat, 25° board, to about 60° knee flexion. Same setup, same time of day, every morning after a lower day.</p>
-    <div class="scale">${Array.from({length:11},(_,i)=>`<button class="${i>3?'hi':''}" onclick="logKnee(${i})">${i}</button>`).join("")}</div>
-    <div class="verdict ${vc}">${vt}</div>
-    ${log.length?`<p class="small" style="margin-top:12px">Recent — ${log.map(x=>x.v).join(" · ")}</p>`:""}
-  </div>
-
-  <h2>The core — Heavy Slow Resistance</h2>
+function renderNotes(){
+  const vols=volume(), max=Math.max(...vols.map(v=>v.v));
+  $("#v-notes").innerHTML = `
+  <h2>Recovery, in order of leverage</h2>
   <div class="card"><table class="tbl">
-    <tr><th>Day</th><th>Movement</th><th>Prescription</th></tr>
-    <tr><td class="m">Lower A</td><td>Hack / pendulum squat</td><td class="m" style="color:var(--tendon)">4 × 6–10 · 3s/3s</td></tr>
-    <tr><td class="m">Lower A</td><td>Leg extension, long length</td><td class="m" style="color:var(--tendon)">3 × 12–15 · 3s/3s</td></tr>
-    <tr><td class="m">Lower B</td><td>Leg extension</td><td class="m" style="color:var(--tendon)">3 × 10–12 · 3s/3s</td></tr>
-  </table>
-  <p class="small" style="margin:10px 0 0">That is the entire tendon programme — two sessions per week, heavy, slow, progressive, embedded in the lifting days rather than run as a separate injury block. Everything else on the lower days supports it.</p>
-  <a class="vid sm" href="${yt('heavy slow resistance patellar tendinopathy protocol')}" target="_blank" rel="noopener">▶ Heavy Slow Resistance explained</a></div>
+    <tr><td class="m">01</td><td><strong>Sleep 7–9 h on a consistent schedule.</strong> The biggest lever, and it needs no invented statistic to justify it.</td></tr>
+    <tr><td class="m">02</td><td><strong>Protein 1.6–2.2 g/kg/day</strong> across 3–5 feedings, upper end while running this plan.</td></tr>
+    <tr><td class="m">03</td><td><strong>Eat enough.</strong> Hypertrophy, tendon repair and six slots per cycle cannot be funded from a deficit. Run fat loss as a separate block later.</td></tr>
+    <tr><td class="m">04</td><td>Rest days between any slots, as many as you need.</td></tr>
+    <tr><td class="m">05</td><td>Autoregulate with RIR. The prescription is a target, not a contract — on a bad day the same RIR at a lower load is correct.</td></tr>
+    <tr><td class="m">06</td><td>Lifting and conditioning never share a day. Built into the structure.</td></tr>
+  </table></div>
 
-  <div class="note"><div class="nt" style="color:var(--tendon)">Why HSR, honestly</div>
-    <p>Never beaten by any other exercise intervention in the 2026 network meta-analysis of 17 RCTs, and in Kongsgaard 2009 it matched eccentric training on pain and function at 12 weeks while producing superior collagen turnover, reduced neovascularisation and higher 6-month satisfaction. It also has the practical advantage of <em>being</em> strength training, so it does not compete with your other goals for time or recovery.</p>
-    <p><strong>The part usually left out:</strong> in that same trial, tendon mechanical properties were unaffected by treatment. Twelve weeks of HSR improved symptoms and turnover without measurably changing tendon mechanics. Symptom improvement is not the same as structural repair.</p></div>
+  <h2>When to take a lighter cycle</h2>
+  <div class="note load"><div class="nt">Triggered, not scheduled</div>
+    ${LIGHTER.map(x=>`<p>— ${x}</p>`).join("")}</div>
+  <div class="card"><p class="small"><strong>What a lighter cycle looks like:</strong> volume cut roughly in half, effort at RIR 3–4, load and movement patterns kept. Zone 2 continues; skip the 4×4.</p>
+  <p class="small" style="margin-bottom:0"><strong>Why, honestly:</strong> not for muscle. A survey of 246 competitive athletes found deloads roughly every 5.6 weeks, and Coleman 2024 tested a one-week deload and found no hypertrophy benefit. You take lighter cycles here for the <strong>tendon and joints</strong> — connective tissue adapts slower than muscle, and a symptomatic patellar tendon under twice-weekly heavy slow loading is the thing most likely to force an unplanned break.</p></div>
 
-  <h2>Isometrics — optional, honestly framed</h2>
+  <h2>TRT</h2>
   <div class="card">
-    <p class="small"><strong>Spanish squat: 5 × 45 s at ~70% MVIC, 2 min rest.</strong> Band anchored behind the knees, torso upright. Done properly this reaches roughly 70% MVIC where a wall sit typically reaches ~60% — that is what makes it a real patellar tendon loader rather than just a burn.</p>
-    <p class="small">The dosing is correctly transcribed from Rio 2015. The <em>rationale</em> is weaker than it is usually presented: <strong>n = 6</strong>, and Clifford 2020 (10 studies) found isometric exercise was not superior to isotonic at any timepoint up to 12 weeks.</p>
-    <p class="small" style="margin-bottom:0"><strong>Run it as a personal experiment, not a mandate.</strong> Try it before Lower A for two weeks. If the hack squat feels better afterwards, keep it. If it just makes your quads tired, move it to the end or drop it. Either decision is evidence-consistent.</p>
-    <a class="vid sm" href="${yt('Spanish squat setup patellar tendon isometric')}" target="_blank" rel="noopener">▶ Spanish squat setup</a></div>
-
-  <h2>Supporting structures</h2>
-  <div class="card"><table class="tbl">
-    <tr><td>Glute medius · frontal-plane hip control</td><td class="m">2×/wk</td></tr>
-    <tr><td>Adductors · Copenhagen</td><td class="m">1–2×/wk</td></tr>
-    <tr><td>Hamstrings · seated curl + Nordic</td><td class="m">2×/wk</td></tr>
-    <tr><td>Tibialis anterior</td><td class="m">2×/wk</td></tr>
-    <tr><td>Gastrocnemius / soleus</td><td class="m">2×/wk each</td></tr>
-    <tr><td>Single-leg control · split squat, carries</td><td class="m">2×/wk</td></tr>
-  </table>
-  <p class="small" style="margin:10px 0 0">Not optional. Knee load is largely determined upstream and downstream of the knee itself.</p></div>
-
-  <h2>Treat the donut, not the hole</h2>
-  <div class="card"><p class="small" style="margin:0">Tendon imaging abnormalities are common in people with no symptoms and correlate poorly with pain; symptoms improve without structural change on imaging (van Ark 2018). The tendon has a healthy, load-bearing region around the pathological area — the donut — and rehab works by building capacity there, not by repairing the hole. Which is why your progress metric is <strong>what you can load without a 24-hour flare</strong>, and never a scan.</p></div>
-
-  <h2>Tests · every 4 weeks</h2>
-  <div class="scroll"><table class="tbl"><tr><th>Test</th><th>Method</th><th>Target</th></tr>
-    <tr><td>Single-leg decline squat</td><td class="small">25° board, single leg, ~60° flexion, rate 0–10</td><td class="m">↓ trend; ≤2/10</td></tr>
-    <tr><td>Single-leg press</td><td class="small">Work up to a heavy 5, pain-free, both legs</td><td class="m">≈150% BW</td></tr>
-    <tr><td>L–R asymmetry</td><td class="small">Compare single-leg 5RM</td><td class="m">within 10%</td></tr>
-    <tr><td>Aerobic threshold</td><td class="small">30 min at fixed HR, record distance/power</td><td class="m">↑ per 8 wks</td></tr>
-  </table></div>
-  <a class="vid sm" href="${yt('single leg decline squat test tendinopathy how to')}" target="_blank" rel="noopener">▶ Decline squat test</a>
-  <a class="vid sm" href="${yt('Nordic hamstring curl progression beginner')}" target="_blank" rel="noopener">▶ Nordic hamstring progression</a>
-  <a class="vid sm" href="${yt('Copenhagen adduction progression short lever')}" target="_blank" rel="noopener">▶ Copenhagen progression</a>
-
-  <div class="note halt"><div class="nt">Plyometric gate — all three, not any one</div>
-    <p>No jumping, bounding, depth work or reactive loading enters this programme until: single-leg press ≈150% bodyweight pain-free on <strong>both</strong> legs; single-leg decline squat ≤2/10; and four consecutive weeks with no 24-hour flare. When all three are met, add plyometrics as a fourth category on Lower A — low volume, high quality, early in the session. Note this is the one context where the concurrent-training interference effect genuinely applies, so keep the 4×4 at least 48 h from power work.</p></div>`;
-}
-async function logKnee(v){
-  state.knee.push({d:new Date().toISOString().slice(0,10), v});
-  if(state.knee.length>60) state.knee=state.knee.slice(-60);
-  await store.set("knee",state.knee);
-  renderKnee();
-}
-
-/* ============================================================
-   PLAN
-   ============================================================ */
-function renderPlan(){
-  $("#v-plan").innerHTML = `
-  <h2>Twelve weeks · two parallel tracks</h2>
-  <p class="small">The strength track progresses by double progression, gated on performance. The tendon track progresses by load and rep-range on a fixed schedule, gated on symptoms. They share sessions but not logic.</p>
+    <p class="small"><strong>Supported:</strong> restoring testosterone to high-normal increases muscle protein synthesis, lean mass and strength, dose-dependently within the physiological range, and the effects with training are additive.</p>
+    <p class="small"><strong>Not supported:</strong> that it shortens the MPS window, justifies daily muscle hits, or changes the volume and proximity-to-failure landmarks.</p>
+    <p class="small" style="margin-bottom:0"><strong>Untested:</strong> that it raises the tolerable-volume ceiling. Plausible chain of inferences, no study behind it. The set counts here are justified by the volume literature, not by your prescription.</p></div>
   <div class="scroll"><table class="tbl">
-    <tr><th>Wk</th><th>Phase</th><th>Strength / hypertrophy</th><th>Tendon (HSR)</th><th>RIR</th></tr>
-    ${PROG.map(p=>`<tr><td class="m">${p.w}</td><td class="m" style="color:var(--load)">${p.p}</td><td class="small">${p.s}</td><td class="small" style="color:#c0aede">${p.t}</td><td class="m">${p.r}</td></tr>`).join("")}
-  </table></div>
-  <div class="note tendon"><div class="nt">The rule that overrides the table</div>
-    <p>You advance a tendon tier only when the previous tier has been tolerated for <strong>two consecutive sessions</strong> under the 24-hour rule. If it has not, you repeat the tier. A tendon that takes 16 weeks to reach 6RM has still succeeded. One rushed to 6RM in 8 weeks and flared has not.</p></div>
-  <p class="small"><strong>After week 12:</strong> repeat with new exercise variations in the same movement patterns, restarting the HSR track at ~12RM with the higher absolute loads you have earned. Retest the single-leg press and the aerobic threshold in week 13.</p>
-
-  <h2>Deload</h2>
-  <div class="card"><table class="tbl">
-    <tr><td class="m" style="color:var(--load)">−40–50%</td><td>Volume. Roughly halve the sets.</td></tr>
-    <tr><td class="m" style="color:var(--load)">RIR 3–4</td><td>Effort, across the board.</td></tr>
-    <tr><td class="m" style="color:var(--load)">Keep</td><td>Load (or −10%) and all movement patterns. Do not go light and high-rep — that is a different stimulus, not a deload.</td></tr>
-    <tr><td class="m" style="color:var(--load)">Keep</td><td>Frequency. Same four lifting days.</td></tr>
-    <tr><td class="m" style="color:var(--aero)">Continue</td><td>Zone 2 — already low-cost.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">Skip</td><td>The 4×4. Replace with Zone 2.</td></tr>
-  </table></div>
-  <div class="note"><div class="nt" style="color:var(--ash)">Why deload, honestly</div>
-    <p>Deloading is near-universal practice with surprisingly thin direct support. A survey of 246 competitive athletes found deloads every 5.6 ± 2.3 weeks lasting 6.4 ± 1.7 days, with volume cut, frequency kept and effort reduced via RIR — exactly the prescription above, derived from practice rather than outcome trials. Coleman 2024 tested a one-week deload and found <strong>no</strong> hypertrophy benefit.</p>
-    <p><strong>So why do it?</strong> Not for muscle — for the tendon and joints. Connective tissue adapts on a slower timescale than muscle, and a symptomatic patellar tendon taking twice-weekly heavy slow loading for six straight weeks is the thing most likely to force an unplanned break. This deload is tendon insurance, and it is honest to call it that.</p></div>
-
-  <h2>Recovery · in order of leverage</h2>
-  <div class="card"><table class="tbl">
-    <tr><td class="m">01</td><td><strong>Sleep 7–9 h on a consistent schedule.</strong> The biggest lever, and it needs no fabricated percentage attached. Consistency of timing matters alongside duration.</td></tr>
-    <tr><td class="m">02</td><td><strong>Protein 1.6–2.2 g/kg/day</strong> across 3–5 feedings. Upper end while running four lifting days plus tendon rehab.</td></tr>
-    <tr><td class="m">03</td><td><strong>Adequate energy.</strong> Your brief omits calories entirely and it matters — hypertrophy, four lifting days, two conditioning days and connective-tissue repair cannot all be funded from a deficit. Run body composition as a separate later block; do not recomp through a tendon rehab phase.</td></tr>
-    <tr><td class="m">04</td><td>One full rest day, genuinely off.</td></tr>
-    <tr><td class="m">05</td><td>Deload every 6–8 weeks.</td></tr>
-    <tr><td class="m">06</td><td>Autoregulate with RIR. The prescription is a target, not a contract — on a bad day, the same RIR at a lower load is correct execution.</td></tr>
-    <tr><td class="m">07</td><td>Cardio and lifting fully separated. The ≥6 h rule is satisfied by structure, permanently.</td></tr>
-  </table></div>
-
-  <h2>TRT considerations</h2>
-  <div class="card">
-    <p class="small"><strong>Supported:</strong> restoring testosterone to high-normal increases muscle protein synthesis, satellite-cell activity, lean mass and strength, with dose-dependent effects in the physiological range. Combined with resistance training the effects are additive.</p>
-    <p class="small"><strong>Not supported:</strong> that it shortens the MPS window; that it justifies daily muscle hits or higher frequency than an evidence-based natural programme; that it changes the volume or proximity-to-failure landmarks.</p>
-    <p class="small" style="margin-bottom:0"><strong>Untested:</strong> that it raises the tolerable-volume ceiling. It is a chain of plausible inferences with no study behind it. Operationally it barely matters — 16–20 fractional sets for priority muscles is what the volume literature supports anyway, and sits well below the ~31-set threshold. Run it; just attribute it correctly.</p></div>
-  <div class="scroll"><table class="tbl">
-    <tr><th>Marker</th><th>Why</th><th>Typical guidance</th></tr>
-    <tr><td class="m">Hematocrit</td><td class="small">Most common lab adverse effect of TRT; raises blood viscosity.</td><td class="small">Baseline, 3–6 months, then annually. Endocrine Society 2018: withhold if &gt;54% until normalised, then resume lower. AUA: ≥54% warrants intervention; some clinicians watch from 50–52%.</td></tr>
+    <tr><th>Marker</th><th>Why</th><th>Guidance</th></tr>
+    <tr><td class="m">Haematocrit</td><td class="small">Most common lab effect of TRT; raises viscosity. <strong>Directly relevant to your current symptoms.</strong></td><td class="small">Baseline, 3–6 months, then annually. Endocrine Society: withhold above 54% until normalised. AUA: ≥54% warrants intervention; some watch from 50–52%.</td></tr>
     <tr><td class="m">Blood pressure</td><td class="small">TRT and heavy lifting both raise it; intervals add acute load.</td><td class="small">Baseline and regularly. A home cuff between labs is useful.</td></tr>
     <tr><td class="m">Lipids</td><td class="small">Formulation-dependent.</td><td class="small">Per prescriber.</td></tr>
-    <tr><td class="m">PSA</td><td class="small">Standard TRT surveillance.</td><td class="small">Per prescriber.</td></tr>
+    <tr><td class="m">PSA</td><td class="small">Standard surveillance.</td><td class="small">Per prescriber.</td></tr>
   </table></div>
-  <div class="note halt"><div class="nt">Read VO₂max alongside a hematocrit, not instead of one</div>
-    <p>The Mendelian randomisation work found <strong>hematocrit and free testosterone in men were both causally associated with higher VO₂max</strong>. So on TRT, an improving VO₂max may partly reflect oxygen-carrying capacity rather than cardiac adaptation — the same physiology your prescriber is monitoring for risk. A rising number is not automatically good news on its own.</p></div>
+  <div class="note halt"><div class="nt">Read VO₂max alongside a haematocrit, not instead of one</div>
+    <p>Mendelian randomisation found haematocrit and free testosterone in men were both causally associated with higher VO₂max. On TRT, an improving VO₂max may partly reflect oxygen-carrying capacity rather than cardiac adaptation — the same physiology being monitored for risk. A rising number is not automatically good news.</p></div>
 
   <h2>Supplements</h2>
   <div class="scroll"><table class="tbl">
     <tr><th></th><th>Dose</th><th>Timing</th><th>Evidence</th></tr>
-    <tr><td><strong>Collagen / gelatin<br>+ vitamin C</strong></td><td class="m">15 g<br>+ ~50 mg</td><td class="m">30–60 min pre<br>Lower A & B</td><td class="small">Shaw 2017 roughly doubled collagen I propeptide (n=8). <strong>No strength benefit</strong> (Kirmse 2024). Take it for the tendon, not the lift.</td></tr>
+    <tr><td><strong>Collagen or gelatin + vitamin C</strong></td><td class="m">15 g<br>+ ~50 mg</td><td class="m">30–60 min before<br>slots 01 and 04</td><td class="small">Shaw 2017 roughly doubled collagen I propeptide (n=8). <strong>No strength benefit</strong> (Kirmse 2024). Take it for the tendon, not the lift.</td></tr>
     <tr><td><strong>Creatine monohydrate</strong></td><td class="m">3–5 g</td><td class="m">daily, any time</td><td class="small">Strongest evidence base of any training supplement.</td></tr>
     <tr><td><strong>Omega-3 EPA/DHA</strong></td><td class="m">2–3 g</td><td class="m">with food</td><td class="small">Recovery, soreness, cardiovascular health.</td></tr>
-    <tr><td><strong>Vitamin D3</strong></td><td class="m">1,000–2,000 IU</td><td class="m">with fat</td><td class="small"><strong>Test first.</strong> Deficiency is very common among South Asian adults even with high sun exposure — measure 25(OH)D rather than guessing.</td></tr>
+    <tr><td><strong>Vitamin D3</strong></td><td class="m">1,000–2,000 IU</td><td class="m">with fat</td><td class="small"><strong>Test first.</strong> Deficiency is common among South Asian adults even with high sun exposure.</td></tr>
   </table></div>
   <div class="note"><div class="nt" style="color:var(--ash)">Not recommended</div>
-    <p>Glucosamine and chondroitin (modest for osteoarthritis pain, not tendinopathy), MSM, turmeric/curcumin, proprietary "tendon blends." Promising mechanisms, insufficient outcome data.</p></div>
+    <p>Glucosamine, chondroitin, MSM, turmeric, and proprietary tendon blends. Promising mechanisms, insufficient outcome data.</p></div>
 
-  <h2>Thresholds that change the plan</h2>
-  ${THRESH.map(t=>`<div class="note ${t[2]==='ok'?'':t[2]}" ${t[2]==='ok'?'style="border-color:var(--ok);background:#12291d"':''}>
-    <div class="nt" ${t[2]==='ok'?'style="color:var(--ok)"':''}>${t[0]}</div><p>${t[1]}</p></div>`).join("")}`;
+  <h2>Weekly volume, computed</h2>
+  <p class="small">Direct sets count as 1, indirect as 0.5. Calculated live from the sessions in this app, assuming one full cycle per 6–8 days.</p>
+  ${vols.map(v=>{
+    const pri=v.v>=16, reh=["Hip abductors","Adductors","Tibialis anterior","Rotator cuff"].includes(v.mu);
+    return `<div class="vol"><div class="vol-t"><span>${v.mu} <span style="color:var(--ash-dim);font-size:11px">${v.f}× per cycle</span></span><span>${v.v}</span></div>
+    <div class="vol-b"><i class="${pri?'pri':reh?'reh':''}" style="width:${Math.min(100,v.v/max*100)}%"></i><u style="left:${16/max*100}%"></u></div></div>`;}).join("")}
+  <p class="small" style="margin-top:14px">Every muscle twice per cycle. Marker line is 16 sets. Stretch a cycle beyond about 8 days and these numbers stop being true.</p>`;
 }
 
 /* ============================================================
    EVIDENCE
    ============================================================ */
 function renderEvid(){
-  const counts = FACTS.reduce((a,f)=>{a[f.v]=(a[f.v]||0)+1;return a;},{});
+  const counts=FACTS.reduce((a,f)=>{a[f.v]=(a[f.v]||0)+1;return a;},{});
   $("#v-eviq").innerHTML = `
   <div class="note"><div class="nt" style="color:var(--ash)">How to read this</div>
-    <p>Every claim from the original protocol and from your redesign brief was re-checked against primary sources in August 2026. Where a figure could not be verified from a primary source, that is stated rather than smoothed over. <strong>No citation here was written from memory alone.</strong></p></div>
+    <p>Every claim behind this plan was checked against primary sources in August 2026. Where a figure could not be verified from a primary source, that is stated rather than smoothed over. <strong>No citation here was written from memory alone.</strong></p></div>
   <div class="card" style="display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
     <span><b style="color:var(--ok);font-size:16px">${counts.s||0}</b> supported</span>
     <span><b style="color:var(--load);font-size:16px">${counts.p||0}</b> partial</span>
     <span><b style="color:var(--halt);font-size:16px">${counts.c||0}</b> contradicted</span>
     <span><b style="color:var(--tendon);font-size:16px">${counts.u||0}</b> weak / untested</span>
   </div>
-
   <h2>Fact check</h2>
   ${FACTS.map(f=>`<div class="card">
-    <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:7px">
-      <span class="vd ${f.v}">${f.l}</span>
-    </div>
+    <div style="margin-bottom:7px"><span class="vd ${f.v}">${f.l}</span></div>
     <h3 style="font-size:13.5px;line-height:1.4;margin-bottom:6px">${f.c}</h3>
-    <p class="small" style="margin:0">${f.f}</p>
-  </div>`).join("")}
-
-  <h2>What changed from v1</h2>
-  <div class="card"><table class="tbl">
-    <tr><td class="m" style="color:var(--halt)">−</td><td>The standalone Saturday half day. Content redistributed; no muscle lost frequency.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">−</td><td>Pre-exhaustion and activation supersets — no proven benefit when activation is already good.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">−</td><td>Redundant overlapping isolation angles.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">−</td><td>Early ballistic knee loading — now gated behind three criteria.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">−</td><td>The fabricated sleep-adaptation percentage.</td></tr>
-    <tr><td class="m" style="color:var(--halt)">−</td><td>Any "TRT justifies daily muscle hits" reasoning.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Full lifting/conditioning separation, with the stronger male lower-body-strength justification.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Zone 2 reframed around recovery cost; 4×4 promoted to default.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Diagnosis gate before week 1.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Left knee: lead-with-left instead of extra heavy load.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Energy availability, previously absent.</td></tr>
-    <tr><td class="m" style="color:var(--ok)">+</td><td>Live volume computation, so the redistribution is verifiable rather than claimed.</td></tr>
-  </table></div>
-  <p class="small"><strong>Preserved from v1 because it was already well-founded:</strong> twice-weekly frequency, stretch-position exercise selection, removal of activation and pre-exhaust drills, gastroc/soleus differentiation, Spanish-squat dosing, HSR as the tendon core, and collagen + vitamin C timing.</p>
-
+    <p class="small" style="margin:0">${f.f}</p></div>`).join("")}
   <h2>Sources</h2>
   ${CITES.map(c=>`<div class="cite">${c}</div>`).join("")}`;
 }
-
-/* ============================================================
-   HEART RATE — computed, not hard-coded
-   ============================================================ */
-function hrmax(){ return state.hrmax || (220 - (state.age||39)); }
-function hrBox(kind){
-  const m = hrmax();
-  const z2 = [Math.round(m*.60), Math.round(m*.70)];
-  const hi = [Math.round(m*.90), Math.round(m*.95)];
-  const rec = Math.round(m*.70);
-  return `<div class="hrbox">
-    <div class="tool-name" style="margin-bottom:8px">${kind==='z2'?'Your Zone 2 window':'Your interval targets'}</div>
-    ${kind==='z2'
-      ? `<div class="hrbig" style="color:var(--aero)">${z2[0]}–${z2[1]} bpm</div>
-         <div class="hrsub">60–70% of an estimated max of ${m}. If you drift above this, the day stops being cheap.</div>`
-      : `<div class="hrbig" style="color:var(--aero)">${hi[0]}–${hi[1]} bpm</div>
-         <div class="hrsub">Work intervals at 90–95% of an estimated max of ${m}. Recovery blocks at about ${rec} bpm.</div>`}
-    <div class="hrin">
-      <input type="number" value="${state.age||39}" min="18" max="90" onchange="setAge(this.value)">
-      <label>Age — used for the 220−age estimate. A measured max from a ramp test is more accurate; enter it below if you have one.</label>
-    </div>
-    <div class="hrin">
-      <input type="number" value="${state.hrmax||''}" placeholder="—" min="120" max="220" onchange="setHrmax(this.value)">
-      <label>Measured HRmax, if you know it. Overrides the estimate.</label>
-    </div>
-  </div>`;
-}
-async function setAge(v){ state.age=+v||39; await store.set("age",state.age); renderTrain(); }
-async function setHrmax(v){ state.hrmax = v?+v:null; await store.set("hrmax",state.hrmax); renderTrain(); }
-
-/* ============================================================
-   TODAY — the daily driver
-   ============================================================ */
-const DAILY = {
-  lift:[
-   ["Warm up properly","5 min easy cardio → 5 min mobility with ankle work → ramp sets on the first compound"],
-   ["Set your RIR for the week","Target {rir} today — the prescription is a target, not a contract"],
-   ["Log your loads","Double progression only works if you know what you did last time"]
-  ],
-  lower:[
-   ["Collagen + vitamin C","15 g with ~50 mg vitamin C, 30–60 min before you start — this is a tendon day"],
-   ["Warm up properly","5 min easy cardio → mobility with weighted ankle dorsiflexion → ramp sets"],
-   ["HSR tempo is {tier} at 3 s / 3 s","If the tempo breaks, the set ended two reps ago"],
-   ["Lead with the left","On every unilateral movement, left first, then match the reps on the right"],
-   ["Log tomorrow's knee score","Single-leg decline squat, first thing in the morning"]
-  ],
-  z2:[
-   ["Keep it conversational","Full sentences without gasping. Short phrases means you have gone too hard"],
-   ["45–60 minutes, knee-friendly","Bike, row, incline walk. No running while the tendon is symptomatic"],
-   ["This is a recovery day with a training label","Its job is cheap aerobic volume, not a mitochondrial peak"]
-  ],
-  vo2:[
-   ["Check your resting heart rate","Up 7 bpm or more on baseline? Swap to Zone 2 today"],
-   ["Confirm you are cleared","Maximal-HR intervals need explicit physician sign-off on TRT"],
-   ["Pace the first interval easy","If interval four is survival, the first two were too hard"],
-   ["Bike, row or incline — not running","Same cardiac stimulus, a fraction of the tendon load"]
-  ],
-  rest:[
-   ["Sleep 7–9 hours","The single biggest lever in this programme, and the one you control tonight"],
-   ["Hit your protein","1.6–2.2 g/kg across 3–5 feedings — do not skip it because you did not train"],
-   ["Actually rest","No 'light' session. The rest day is positioned to set up Monday's tendon work"]
-  ]
-};
-const ALWAYS = [
-  ["Sleep 7–9 h, consistent timing","Biggest recovery lever. No fabricated percentage needed."],
-  ["Protein 1.6–2.2 g/kg","Across 3–5 feedings. Upper end while running four lifting days."],
-  ["Creatine 5 g","Any time of day. The most reliable supplement you take."],
-  ["Eat enough","Tendon repair, hypertrophy and six training days cannot be funded from a deficit."],
-  ["Respect the 24-hour rule","≤3/10 during, settled within 24 h. It outranks the progression table."]
-];
-
-function todayKey(){ return new Date().toISOString().slice(0,10); }
-async function checkOff(idx,el){
-  const k = todayKey();
-  state.daily = state.daily||{};
-  state.daily[k] = state.daily[k]||[];
-  const a = state.daily[k], i = a.indexOf(idx);
-  if(i>=0) a.splice(i,1); else a.push(idx);
-  el.classList.toggle("on");
-  await store.set("daily",state.daily);
-}
-
-function renderToday(){
-  const dow = new Date().getDay();
-  const idx = dow===0?6:dow-1;
-  const d = WEEK[idx];
-  const nxt = WEEK[(idx+1)%7];
-  const lift = !!S[d.key];
-  const ses = S[d.key]||COND[d.key];
-  const pr = lift?progress(d.key):null;
-  const w = state.week;
-
-  let list;
-  if(d.key==="rest") list=DAILY.rest;
-  else if(d.key==="zone2") list=DAILY.z2;
-  else if(d.key==="vo2") list=DAILY.vo2;
-  else if(d.key.startsWith("lower")) list=DAILY.lower;
-  else list=DAILY.lift;
-  list = list.map(x=>[x[0].replace("{rir}",rirTarget(w)).replace("{tier}",hsrTier(w)), x[1]]);
-  const dchecks = (state.daily&&state.daily[todayKey()])||[];
-
-  const kneeLast = state.knee.length?state.knee[state.knee.length-1]:null;
-  const kneeToday = kneeLast && kneeLast.d===todayKey();
-
-  const R=26, C=2*Math.PI*R;
-  const heroCls = d.key==="rest"?"rest":(lift?"":"aero");
-  const accent = d.key==="rest"?"var(--ash-dim)":(lift?"var(--load)":"var(--aero)");
-
-  $("#v-today").innerHTML = `
-  <div class="hero ${heroCls}">
-    <div class="hero-lbl">${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][idx]} · Week ${w} · ${phaseName(w)}</div>
-    <h2 class="hn">${d.full}</h2>
-    <div class="hs">${ses?ses.tag:"Complete rest. Nothing today — that is the prescription."}</div>
-    ${lift?`
-      <div class="ring">
-        <svg width="60" height="60"><circle cx="30" cy="30" r="${R}" fill="none" stroke="#2a323f" stroke-width="5"/>
-        <circle cx="30" cy="30" r="${R}" fill="none" stroke="${accent}" stroke-width="5" stroke-linecap="round"
-          stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pr.pct/100)}"/></svg>
-        <div class="rt"><b>${pr.done} of ${pr.total} sets</b><br>${pr.pct}% complete${pr.pct===100?" — done for today":""}</div>
-      </div>`:""}
-    <div class="hero-stats">
-      ${lift?`
-        <div><div class="k">Sets</div><div class="v">${pr.total}</div></div>
-        <div><div class="k">RIR</div><div class="v">${rirTarget(w)}</div></div>
-        <div><div class="k">${d.tendon?"HSR":"Est."}</div><div class="v" style="font-size:${d.tendon?'11px':'15px'}">${d.tendon?hsrTier(w):"~75 min"}</div></div>`
-      : d.key==="rest"?`
-        <div><div class="k">Sleep</div><div class="v">7–9 h</div></div>
-        <div><div class="k">Protein</div><div class="v">1.6–2.2</div></div>
-        <div><div class="k">Training</div><div class="v">None</div></div>`
-      :`
-        <div><div class="k">Time</div><div class="v">${d.key==="vo2"?"~38 m":"45–60 m"}</div></div>
-        <div><div class="k">Target</div><div class="v">${d.key==="vo2"?Math.round(hrmax()*.90)+"+":Math.round(hrmax()*.60)+"–"+Math.round(hrmax()*.70)}</div></div>
-        <div><div class="k">Impact</div><div class="v">Low</div></div>`}
-    </div>
-    ${d.key!=="rest"?`<button class="b go ${lift?'':'aero'}" style="width:100%" onclick="goSession('${d.key}')">${pr&&pr.done>0?'Continue':'Start'} ${d.full} →</button>`:""}
-  </div>
-
-  ${w===7?`<div class="note aero"><div class="nt">Deload week</div><p>Volume cut roughly in half, RIR 3–4, load and movement patterns kept. Zone 2 continues; skip the 4×4. This deload is tendon insurance, not a hypertrophy strategy — connective tissue adapts slower than muscle.</p></div>`:""}
-
-  <h2>Today's checklist</h2>
-  <div class="card" style="padding:4px 15px">
-    ${list.map((c,i)=>`<div class="check ${dchecks.includes(i)?'on':''}" onclick="checkOff(${i},this)">
-      <span class="box">✓</span><span><span class="ct2">${c[0]}</span><span class="cw">${c[1]}</span></span></div>`).join("")}
-  </div>
-
-  ${d.tendon||d.key==="rest"?`
-  <h2>Knee — morning score</h2>
-  <div class="card">
-    <p class="small" style="margin-bottom:2px">Single-leg decline squat, 25° board, same time each morning after a lower day.</p>
-    <div class="scale">${Array.from({length:11},(_,i)=>`<button class="${i>3?'hi':''} ${kneeToday&&kneeLast.v===i?'on':''}" onclick="logKnee(${i});setView('today')">${i}</button>`).join("")}</div>
-    ${kneeToday?`<div class="verdict ${kneeLast.v>3?'drop':kneeLast.v>2?'hold':'go'}">${
-      kneeLast.v>3?"Above 3/10. Drop the tendon load one tier at the next session. Do not push through."
-      :kneeLast.v>2?"Borderline. Hold the current tier rather than advancing."
-      :"Inside tolerance. Progress as scheduled."}</div>`
-      :`<p class="small" style="margin:8px 0 0;color:var(--ash-dim)">Not logged today.</p>`}
-    <a class="vid sm" href="${yt('single leg decline squat test patellar tendinopathy')}" target="_blank" rel="noopener">▶ How to perform the decline squat test</a>
-  </div>`:""}
-
-  <h2>Every day, regardless</h2>
-  <div class="card" style="padding:4px 15px">
-    ${ALWAYS.map((c,i)=>`<div class="check ${dchecks.includes(100+i)?'on':''}" onclick="checkOff(${100+i},this)">
-      <span class="box">✓</span><span><span class="ct2">${c[0]}</span><span class="cw">${c[1]}</span></span></div>`).join("")}
-  </div>
-
-  <h2>Block week</h2>
-  <div class="wksel">${Array.from({length:12},(_,i)=>`<button class="${i+1===7?'dl':''} ${i+1===w?'on':''}" onclick="setWeek(${i+1})">${i+1}</button>`).join("")}</div>
-  <div class="card"><table class="tbl">
-    <tr><td class="m" style="color:var(--load)">Phase</td><td>${phaseName(w)}</td></tr>
-    <tr><td class="m" style="color:var(--load)">RIR</td><td>${rirTarget(w)}</td></tr>
-    <tr><td class="m" style="color:var(--tendon)">HSR tier</td><td>${hsrTier(w)} at 3 s / 3 s — advance only after two clean sessions under the 24-hour rule</td></tr>
-  </table></div>
-
-  <h2>The rest of the week</h2>
-  <div class="mini">${WEEK.map((x,i)=>`<div class="${x.lane==='top'?'l':x.lane==='bot'?'a':''} ${i===idx?'now':''}" onclick="selDay=${i};setView('week')">${x.d}<br>${x.t}</div>`).join("")}</div>
-  <p class="small">Next up — <strong>${nxt.full}</strong>. ${nxt.why}</p>`;
-}
-async function setWeek(w){ state.week=w; await store.set("week",w); renderToday(); }
 
 /* ============================================================
    INIT
@@ -1953,29 +1339,16 @@ function setView(v){
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
   $("#v-"+v).classList.add("on");
-  ({today:renderToday, week:renderWeek, train:renderTrain, knee:renderKnee, plan:renderPlan, eviq:renderEvid})[v]();
-  window.scrollTo({top:0,behavior:"instant"});
+  ({cycle:renderCycle, knee:renderKnee, nerve:renderNerve, notes:renderNotes, eviq:renderEvid})[v]();
+  window.scrollTo(0,0);
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>setView(b.dataset.v));
+$("#foot").innerHTML = `This is a training document, not medical advice.
+  The neurological symptoms described need assessment by a doctor, and the 4×4 needs clearance before you run it.
+  TRT management, haematocrit and blood pressure monitoring belong with your prescriber.
+  Tendon loading is best overseen by a physiotherapist, including confirming the diagnosis.`;
+renderCycle();
 
-$("#foot").innerHTML = `Verified August 2026 against PubMed, publisher pages and the papers themselves.
-  Medical supervision required for TRT management, maximal-HR intervals and tendon progression.
-  Physiotherapist oversight required for the tendinopathy, including confirming the diagnosis.
-  This is a training document, not medical advice.`;
-
-(async function(){
-  const t = await store.get("ticks");  if(t) state.ticks = t;
-  const k = await store.get("knee");   if(k) state.knee = k;
-  const l = await store.get("loads");  if(l) state.loads = l;
-  const dd = await store.get("daily"); if(dd) state.daily = dd;
-  const a = await store.get("age");    if(a) state.age = a;
-  const hm = await store.get("hrmax"); if(hm) state.hrmax = hm;
-  const w = await store.get("week");   if(w) state.week = w;
-  const today = new Date().getDay();          // 0 = Sun
-  selDay = today === 0 ? 6 : today - 1;
-  curSession = WEEK[selDay].key === "rest" ? "lowerA" : WEEK[selDay].key;
-  renderToday();
-})();
 </script>
 </body>
 </html>
